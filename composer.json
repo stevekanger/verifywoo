@@ -1,0 +1,16 @@
+{
+  "name": "stevekanger/verify-woo",
+  "description": "Simple user email verification for woocommerce",
+  "type": "project",
+  "autoload": {
+    "psr-4": {
+      "VerifyWoo\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "SteveKanger"
+    }
+  ],
+  "require": {}
+}
