@@ -15,6 +15,7 @@ class Plugin {
     ];
 
     public static function activate() {
+        DB::create_table();
     }
 
     public static function deactivate() {
@@ -30,14 +31,18 @@ class Plugin {
                 'post_status' => 'publish',
                 'post_author' => 1,
                 'post_type' => 'page',
-                'post_content' => '<!-- wp:shortcode --> [' . PLUGIN_PREFIX . ' template="page-' . $page['post_name'] . '"] <!-- /wp:shortcode -->'
+                'post_content' => '<!-- wp:shortcode --> [' . PLUGIN_PREFIX . '-page template="page-' . $page['post_name'] . '"] <!-- /wp:shortcode -->'
             );
             wp_insert_post($page, false);
         }
     }
 
     public static function add_shortcodes() {
-        add_shortcode(PLUGIN_PREFIX, [Template::class, 'show_shortcode_template']);
+        add_shortcode(PLUGIN_PREFIX . '-page', [self::class, 'page_template_shortcode']);
+    }
+
+    public static function page_template_shortcode($args) {
+        return Template::get_clean($args['template']);
     }
 
     public static function add_woocommerce_page_class($classes) {

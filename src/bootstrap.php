@@ -7,8 +7,8 @@ use const VerifyWoo\PLUGIN_PREFIX;
 use VerifyWoo\Core\Plugin;
 use VerifyWoo\Core\Registration;
 use VerifyWoo\Core\Settings;
-use VerifyWoo\Core\Auth;
-use VerifyWoo\Core\Router;
+use VerifyWoo\Core\User;
+use VerifyWoo\Core\Routing;
 
 defined('ABSPATH') || exit;
 
@@ -33,7 +33,7 @@ add_filter('woocommerce_registration_errors', [Registration::class, 'validate_re
 add_filter('woocommerce_registration_redirect', [Registration::class, 'on_redirect']);
 
 // Handle verification
-add_filter('woocommerce_process_login_errors', [Auth::class, 'check_verificaiton_on_login'], 10, 3);
+add_filter('woocommerce_process_login_errors', [User::class, 'verify_on_login'], 10, 3);
 
 // Handle routing
-add_action(PLUGIN_PREFIX . '_verification_page_routing', [Router::class, 'verification_page']);
+add_action(PLUGIN_PREFIX . '_route_verification_actions', [Routing::class, 'route_verification_actions']);

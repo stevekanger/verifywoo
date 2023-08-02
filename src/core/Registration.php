@@ -2,8 +2,6 @@
 
 namespace VerifyWoo\Core;
 
-use const VerifyWoo\PLUGIN_PREFIX;
-
 defined('ABSPATH') || exit;
 
 class Registration {
@@ -14,26 +12,24 @@ class Registration {
     }
 
     public static function on_registration($customer_id, $new_customer_data, $password_generated) {
-        $token = Auth::create_token();
-        $timestamp = time();
+        $token = Token::create();
 
-        update_user_meta($customer_id, PLUGIN_PREFIX . '_token', $token);
-        update_user_meta($customer_id, PLUGIN_PREFIX . '_data', [
-            'verified' => false,
-            'token_timestamp' => $timestamp,
-            'prev_email' => null,
-        ]);
+        DB::insert([
+            'user_id' => $customer_id,
+            'token' => $token,
+            'timestamp' => time()
+        ], ['%d', '%s', '%d']);
     }
 
     public static function append_registration_email($content, $user, $email) {
-        $token = get_user_meta($user->ID, PLUGIN_PREFIX . '_token', true);
-        $activation_link = '<a href="' . get_home_url() . '/verification?action=verify&token=' . $token . '">Verify Your Email Address</a>';
-        $new_content = 'Please verify your email address ' . $activation_link;
-        return $new_content . "\n\n" . $content;
+        $token = DB::get_data_by_user_id($user->ID)->token;
+        $activation_uri = get_home_url() . '/verification?action=verification-registration&token=' . $token;
+        $new_content = 'Before you can log in to your account please verify your email address. Click here <a href="' . $activation_uri . '">' . $activation_uri . '</a>';
+        return $new_content . "\n\n" . 'This link will be valid for 1 hour.' . "\n\n" . $content;
     }
 
     public static function add_retype_password_input() {
-        Template::include('input-retype-password');
+        Template::include('partials/input-retype-password');
     }
 
     public static function validate_registration($errors, $username, $email) {

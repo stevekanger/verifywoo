@@ -3,23 +3,29 @@
 namespace VerifyWoo\Core;
 
 use const VerifyWoo\PLUGIN_ROOT_DIR;
+use const VerifyWoo\PLUGIN_PREFIX;
 
 defined('ABSPATH') || exit;
 
 class Template {
-    public static function include($template, $data = null) {
+    public static function include($template, $data = []) {
         if (!$template) return;
-        $themeTemplate = apply_filters('verify_woocommerce_user_templates', $template) . '/' . $template . '.php';
-        if (file_exists($themeTemplate)) {
-            include $themeTemplate;
-            return;
-        }
-        include PLUGIN_ROOT_DIR . '/src/templates/' . $template . '.php';
+        $themeTemplate = self::get_theme_template($template);
+        include $themeTemplate ? $themeTemplate : PLUGIN_ROOT_DIR . '/src/templates/' . $template . '.php';
     }
 
-    public static function show_shortcode_template($args) {
+    public static function get_clean($template, $data = []) {
+        if (!$template) return;
         ob_start();
-        self::include($args['template']);
+        self::include($template, $data);
         return ob_get_clean();
+    }
+
+    static function get_theme_template($template) {
+        $themeTemplate = apply_filters(PLUGIN_PREFIX . '_template_directory', $template) . '/' . $template . '.php';
+        if (file_exists($themeTemplate)) {
+            return $themeTemplate;
+        }
+        return null;
     }
 }
