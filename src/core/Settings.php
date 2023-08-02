@@ -20,23 +20,31 @@ class Settings {
 
     public static function configure_woocommerce_account_settings($settings) {
         foreach ($settings as $index => $field) {
-            if (self::is_required_setting('account', $field['id'] ?? null)) {
-                $settings[$index] = self::update_setting('account', $field);
+            if (self::is_required_woocommerce_setting('account', $field['id'] ?? null)) {
+                $settings[$index] = self::update_woocommerce_setting('account', $field);
             }
         }
         return $settings;
     }
 
-    static function is_required_setting($settingsTab, $id) {
+    static function is_required_woocommerce_setting($settingsTab, $id) {
         return (self::$required_woo_settings[$settingsTab][$id] ?? null) ? true : false;
     }
 
-    static function update_setting($settingsTab, $field) {
+    static function update_woocommerce_setting($settingsTab, $field) {
         $required = self::$required_woo_settings[$settingsTab][$field['id']];
         $current = get_option($field['id'] ?? null);
         if ($required['value'] !== $current) {
             update_option($field['id'], $required['value']);
         }
         return array_merge($field, $required['field']);
+    }
+
+    public static function add_retype_password_input() {
+        Template::include('partials/input-retype-password');
+    }
+
+    public static function set_min_password_strength() {
+        return 1;
     }
 }

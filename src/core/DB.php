@@ -23,6 +23,7 @@ class DB {
             token varchar(100) UNIQUE DEFAULT NULL,
             timestamp bigint(20) DEFAULT NULL,
             verified boolean NOT NULL DEFAULT false,
+            current_email varchar(255) DEFAULT NULL,
             new_email varchar(255) DEFAULT NULL,
             FOREIGN KEY (user_id) REFERENCES ' . $wpdb->prefix . 'users (ID) ON DELETE CASCADE 
         ) AUTO_INCREMENT=1, ' . $charset_collate . ';';
