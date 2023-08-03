@@ -3,7 +3,7 @@
 namespace VerifyWoo;
 
 /**
- * @package verify-woo
+ * @package verifywoo
  * 
  * Plugin Name: Verify Woo - WooCommerce User Verificaiton
  * Plugin URI: http://stevekanger.com
@@ -12,7 +12,7 @@ namespace VerifyWoo;
  * Author: Steve Kanger
  * Author URI: https://stevekanger.com
  * License: GPLv2 or later
- * Text Domain: verify-woo
+ * Text Domain: verifywoo
  * 
  * */
 
@@ -25,3 +25,4 @@ const PLUGIN_ROOT_DIR = __DIR__;
 
 require __DIR__ . '/vendor/autoload.php';
 require __DIR__ . '/src/bootstrap.php';
+require __DIR__ . '/src/routes/frontend.php';

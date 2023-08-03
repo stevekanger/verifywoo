@@ -5,7 +5,7 @@ namespace VerifyWoo\Core;
 defined('ABSPATH') || exit;
 
 class Utils {
-    static function debug(...$items) {
+    public static function debug(...$items) {
         if (true === \WP_DEBUG) {
             foreach ($items as $item) {
                 if (is_array($item) || is_object($item)) {

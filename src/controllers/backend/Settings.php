@@ -1,8 +1,9 @@
 <?php
 
-namespace VerifyWoo\Core;
+namespace VerifyWoo\Controllers\Backend;
 
 use const VerifyWoo\PLUGIN_NAME;
+use const VerifyWoo\PLUGIN_ROOT_DIR;
 
 defined('ABSPATH') || exit;
 
@@ -27,6 +28,11 @@ class Settings {
         return $settings;
     }
 
+    public static function configure_woocommerce_email_settings($settings) {
+        $settings['WC_Email_Customer_New_Account'] = include PLUGIN_ROOT_DIR . '/src/overrides/class-override-wc-email-customer-new-account.php';
+        return $settings;
+    }
+
     static function is_required_woocommerce_setting($settingsTab, $id) {
         return (self::$required_woo_settings[$settingsTab][$id] ?? null) ? true : false;
     }
@@ -38,10 +44,6 @@ class Settings {
             update_option($field['id'], $required['value']);
         }
         return array_merge($field, $required['field']);
-    }
-
-    public static function add_retype_password_input() {
-        Template::include('partials/input-retype-password');
     }
 
     public static function set_min_password_strength() {

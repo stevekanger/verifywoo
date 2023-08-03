@@ -9,32 +9,20 @@ defined('ABSPATH') || exit;
 class Token {
     static function create() {
         $token = bin2hex(random_bytes(32));
-        $exists = get_users([
-            'meta_key' => PLUGIN_PREFIX . '_token',
-            'meta_value' => $token
-        ]);
-
-        return count($exists) ? self::create() : $token;
+        $query = DB::query('SELECT token from ' . DB::prefix(PLUGIN_PREFIX) . ' where token = %s', $token);
+        return $query ? self::create() : $token;
     }
 
     static function verify($token) {
-        if (!$token) return false;
+        if (!$token) return null;
 
-        $data = DB::get_data_by_token($token);
-        if (!$data) return false;
+        $data = DB::get_row('SELECT user_id, email, timestamp from ' . DB::prefix(PLUGIN_PREFIX) . ' where token = %s', $token);
+        if (!$data) return null;
 
         $timestamp = $data->timestamp ?? null;
-        if (!$timestamp || !self::verify_timestamp($timestamp)) return false;
+        if (!$timestamp || !self::verify_timestamp($timestamp)) return null;
 
-        DB::update([
-            'token' => null,
-            'timestamp' => null,
-            'verified' => true,
-        ], [
-            'user_id' => $data->user_id
-        ]);
-
-        return true;
+        return $data;
     }
 
     static function verify_timestamp($timestamp) {

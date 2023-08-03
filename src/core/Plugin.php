@@ -2,6 +2,7 @@
 
 namespace VerifyWoo\Core;
 
+use const VerifyWoo\PLUGIN_NAME;
 use const VerifyWoo\PLUGIN_PREFIX;
 
 defined('ABSPATH') || exit;
@@ -11,11 +12,12 @@ class Plugin {
         'verification' => [
             'post_title' => 'Verification',
             'post_name' => 'verification',
+            'post_state' => PLUGIN_NAME . ' Verification Page'
         ]
     ];
 
     public static function activate() {
-        DB::create_table();
+        DB::maybe_create_table();
     }
 
     public static function deactivate() {
@@ -31,14 +33,23 @@ class Plugin {
                 'post_status' => 'publish',
                 'post_author' => 1,
                 'post_type' => 'page',
-                'post_content' => '<!-- wp:shortcode --> [' . PLUGIN_PREFIX . '-page template="page-' . $page['post_name'] . '"] <!-- /wp:shortcode -->'
+                'post_content' => '<!-- wp:shortcode --> [' . PLUGIN_PREFIX . ' template="page-' . $page['post_name'] . '"] <!-- /wp:shortcode -->'
             );
             wp_insert_post($page, false);
         }
     }
 
+    public static function register_pages_post_state($post_states, $post) {
+        foreach (self::$pages as $page) {
+            if (get_page_by_path($page['post_name'])->ID === $post->ID) {
+                $post_states[PLUGIN_PREFIX . '_' . $page['post_name'] . '_post_state'] = __($page['post_state'], 'woocommerce');
+            }
+        }
+        return $post_states;
+    }
+
     public static function add_shortcodes() {
-        add_shortcode(PLUGIN_PREFIX . '-page', [self::class, 'page_template_shortcode']);
+        add_shortcode(PLUGIN_PREFIX, [self::class, 'page_template_shortcode']);
     }
 
     public static function page_template_shortcode($args) {
