@@ -49,7 +49,7 @@ class Registration {
     public static function on_registration_password_validation($errors, $username, $email) {
         extract($_POST);
         if (strcmp($password, $password2) !== 0) {
-            $errors->add('registration-error', __('Passwords do not match.', 'woocommerce'));
+            $errors->add('registration-error', __('Passwords do not match.', 'verifywoo'));
         }
         return $errors;
     }

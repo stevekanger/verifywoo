@@ -16,7 +16,7 @@ class Token {
     static function verify($token) {
         if (!$token) return null;
 
-        $data = DB::get_row('SELECT user_id, email, timestamp from ' . DB::prefix(PLUGIN_PREFIX) . ' where token = %s', $token);
+        $data = DB::get_row('SELECT * from ' . DB::prefix(PLUGIN_PREFIX) . ' where token = %s', $token);
         if (!$data) return null;
 
         $timestamp = $data->timestamp ?? null;

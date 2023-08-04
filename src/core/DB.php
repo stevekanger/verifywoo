@@ -55,6 +55,11 @@ class DB {
         );
     }
 
+    public static function delete($where, $where_format) {
+        global $wpdb;
+        return $wpdb->delete(self::prefix(PLUGIN_PREFIX), $where, $where_format);
+    }
+
     public static function query($query, $params) {
         global $wpdb;
         return $wpdb->query(

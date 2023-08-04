@@ -8,9 +8,6 @@ defined('ABSPATH') || exit;
 
 class Error {
     public function get() {
-        Template::include('actions/message', [
-            'type' => 'error',
-            'msg' => $_GET['msg'] ?? 'Error',
-        ]);
+        Template::error($_GET['msg'] ?? 'Error');
     }
 }

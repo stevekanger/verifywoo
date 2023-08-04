@@ -18,22 +18,12 @@ class Send {
     public function post() {
         $email = $_POST['email'] ?? null;
 
-        if (!$email) {
-            return Template::include('actions/message', [
-                'type' => 'error',
-                'msg' => 'No email was given.'
-            ]);
-        }
+        if (!$email) return Template::error('Email is required');
 
-        // Select database-row-id where wp_users email = $email and user_id = wp_users->ID
-        $query = DB::get_row('SELECT ' . DB::prefix(PLUGIN_PREFIX . '.id') . ' from ' . DB::prefix(PLUGIN_PREFIX) . ', ' . DB::prefix('users') . ' where ' . DB::prefix('users') . '.user_email = %s AND ' . DB::prefix(PLUGIN_PREFIX) . '.user_id = ' . DB::prefix('users') . '.ID', $email);
-        if (!$query) {
-            return Template::include('actions/message', [
-                'type' => 'error',
-                'msg' => 'There is no user with that email registered.',
-                'show_resend' => true
-            ]);
-        }
+        $query = DB::get_row('SELECT id, verified from ' . DB::prefix(PLUGIN_PREFIX) . ' where email = %s', $email);
+
+        if (!$query) return Template::error('There is no user with that email registered.');
+        if ($query->verified) return Template::error('That email is already registered.');
 
         $token = Token::create();
         $timestamp = time();
@@ -45,29 +35,12 @@ class Send {
             'id' => $query->id
         ]);
 
-        if (!$inserted) {
-            return Template::include('actions/message', [
-                'type' => 'error',
-                'msg' => 'There was an error creating the verirification data. Please try again.'
-            ]);
-        }
+        if (!$inserted) return Template::error('There was an error creating your verification data. Please try again. If the problem persists contact your site administrator.');
 
-        $mailContent = Template::get_clean('emails/send-verification', [
-            'token' => $token
-        ]);
-        $mail = Mail::send($email, get_bloginfo('title') . ' - Verify your email', $mailContent);
+        $mail = Mail::send_token($email, $token);
 
-        if (!$mail) {
-            return Template::include('actions/message', [
-                'type' => 'error',
-                'msg' => 'There was an issue sending your verification token. Please contact your site administrator to verify your email manually.',
-                'show_resend' => true
-            ]);
-        }
-        Template::include('actions/message', [
-            'type' => 'message',
-            'msg' => 'Verification has been sent to your email address.',
-            'show_resend' => true
-        ]);
+        if (!$mail) return Template::error('There was an issue sending your verification token. Please contact your site administrator to verify your email manually.');
+
+        Template::success('Verification has been sent to your email address.');
     }
 }

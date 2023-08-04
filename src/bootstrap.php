@@ -22,8 +22,8 @@ register_deactivation_hook(PLUGIN_ROOT_FILE, [Plugin::class, 'deactivate']);
 // Plugin initializations
 add_action('init', [Session::class, 'init']);
 add_action('init', [Plugin::class, 'register_pages']);
-add_filter('display_post_states', [Plugin::class, 'register_pages_post_state'], 10, 2);
 add_action('init', [Plugin::class, 'add_shortcodes']);
+add_filter('display_post_states', [Plugin::class, 'register_pages_post_state'], 10, 2);
 add_filter('body_class', [Plugin::class, 'add_woocommerce_page_class']);
 
 // Handle Settings
@@ -38,7 +38,7 @@ add_filter('woocommerce_registration_redirect', [Registration::class, 'on_regist
 add_filter('woocommerce_registration_errors', [Registration::class, 'on_registration_password_validation'], 10, 3);
 
 // Handle Information Change Events
-add_filter('send_email_change_email', [InfoChange::class, 'on_email_change'], 10, 1);
+add_filter('woocommerce_save_account_details_errors', [InfoChange::class, 'on_email_change'], 10, 2);
 
 // Handle Login Events
 add_filter('woocommerce_process_login_errors', [Login::class, 'on_login'], 10, 3);

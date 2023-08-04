@@ -28,4 +28,28 @@ class Template {
         }
         return null;
     }
+
+    public static function error($msg, $hide_resend = false) {
+        self::include('actions/message', [
+            'type' => 'error',
+            'msg' => $msg,
+            'hide_resend' => $hide_resend
+        ]);
+    }
+
+    public static function success($msg, $hide_resend = false) {
+        self::include('actions/message', [
+            'type' => 'message',
+            'msg' => $msg,
+            'hide_resend' => $hide_resend
+        ]);
+    }
+
+    public static function info($msg, $hide_resend = false) {
+        self::include('actions/message', [
+            'type' => 'info',
+            'msg' => $msg,
+            'hide_resend' => $hide_resend
+        ]);
+    }
 }

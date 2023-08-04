@@ -2,5 +2,8 @@
 
 <div class="woocommerce-<?php echo $data['type'] ?? 'message'; ?>" role="alert">
     <?php echo $data['msg'] ?? ''; ?>
-    <a href="<?php echo home_url() ?>/verification/?action=send">Resend Verification</a>
 </div>
+
+<?php if (!($data['hide_resend'] ?? false)) : ?>
+    <a class="woocommerce-Button button wp-element-button" href="<?php echo home_url() ?>/verification/?action=send"><?php echo __('Resend Verification', 'verifywoo'); ?></a>
+<?php endif; ?>

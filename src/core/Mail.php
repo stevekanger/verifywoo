@@ -20,4 +20,13 @@ class Mail {
         $mail = self::$mailer->send($recipient, $subject, WC_Emails::instance()->replace_placeholders($content), ['Content-Type: text/html; charset=UTF-8']);
         return $mail;
     }
+
+    public static function send_token($email, $token) {
+        $mailContent = Template::get_clean('emails/send-verification', [
+            'token' => $token
+        ]);
+
+        $mail = self::send($email, get_bloginfo('title') . ' - Verify your email', $mailContent);
+        return $mail;
+    }
 }

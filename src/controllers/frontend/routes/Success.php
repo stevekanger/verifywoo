@@ -8,9 +8,6 @@ defined('ABSPATH') || exit;
 
 class Success {
     public function get() {
-        Template::include('actions/message', [
-            'type' => 'message',
-            'msg' => $_GET['msg'] ?? 'Success'
-        ]);
+        Template::success($_GET['msg'] ?? 'Success');
     }
 }
