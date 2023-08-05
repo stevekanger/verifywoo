@@ -1,6 +1,6 @@
 <?php
 
-namespace VerifyWoo\Controllers\Frontend\Events;
+namespace VerifyWoo\Controllers\App\Events;
 
 use const VerifyWoo\PLUGIN_PREFIX;
 use VerifyWoo\Core\DB;

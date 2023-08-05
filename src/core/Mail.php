@@ -4,6 +4,8 @@ namespace VerifyWoo\Core;
 
 use WC_Emails;
 
+use const VerifyWoo\PLUGIN_PREFIX;
+
 defined('ABSPATH') || exit;
 
 class Mail {
@@ -26,7 +28,9 @@ class Mail {
             'token' => $token
         ]);
 
-        $mail = self::send($email, get_bloginfo('title') . ' - Verify your email', $mailContent);
+        $subject = get_option(PLUGIN_PREFIX . '_verification_email_subject') ?? 'Verify your email';
+
+        $mail = self::send($email, $subject, $mailContent);
         return $mail;
     }
 }

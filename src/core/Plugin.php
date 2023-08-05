@@ -33,7 +33,7 @@ class Plugin {
                 'post_status' => 'publish',
                 'post_author' => 1,
                 'post_type' => 'page',
-                'post_content' => '<!-- wp:shortcode --> [' . PLUGIN_PREFIX . ' template="page-' . $page['post_name'] . '"] <!-- /wp:shortcode -->'
+                'post_content' => '<!-- wp:shortcode --> [' . PLUGIN_PREFIX . ' template="app/page-' . $page['post_name'] . '"] <!-- /wp:shortcode -->'
             );
             wp_insert_post($page, false);
         }

@@ -1,6 +1,6 @@
 <?php
 
-namespace VerifyWoo\Controllers\Frontend\Routes;
+namespace VerifyWoo\Controllers\App\Routes;
 
 use VerifyWoo\Core\Template;
 

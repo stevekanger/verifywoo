@@ -1,13 +1,14 @@
 <?php
 
-namespace VerifyWoo\Controllers\Backend;
+namespace VerifyWoo\Controllers\Admin;
 
 use const VerifyWoo\PLUGIN_NAME;
+use const VerifyWoo\PLUGIN_PREFIX;
 use const VerifyWoo\PLUGIN_ROOT_DIR;
 
 defined('ABSPATH') || exit;
 
-class Settings {
+class WooSettings {
     static $required_woo_settings = [
         'account' => [
             'woocommerce_registration_generate_password' => [
@@ -46,7 +47,7 @@ class Settings {
         return array_merge($field, $required['field']);
     }
 
-    public static function set_min_password_strength() {
-        return 1;
+    public static function min_password_strength() {
+        return get_option(PLUGIN_PREFIX . '_min_password_strength') ?? 3;
     }
 }

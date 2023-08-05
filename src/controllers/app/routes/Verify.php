@@ -1,6 +1,6 @@
 <?php
 
-namespace VerifyWoo\Controllers\Frontend\Routes;
+namespace VerifyWoo\Controllers\App\Routes;
 
 use Verifywoo\Core\Template;
 use VerifyWoo\Core\Token;
@@ -15,7 +15,7 @@ class Verify {
         $token = $_GET['token'] ?? null;
         $data = Token::verify($token);
 
-        if (!$data) return Template::error('There was an issue verifying your token.');
+        if (!$data) return Template::error(__('There was an issue verifying your token.', 'verifywoo'));
 
 
         if ($data->email && $data->user_id) {
@@ -33,10 +33,10 @@ class Verify {
             'user_id' => $data->user_id
         ]);
 
-        if (!$updated) return Template::error('There was an issue verifying your token.');
+        if (!$updated) return Template::error(__('There was an issue verifying your token.', 'verifywoo'));
 
         DB::query('DELETE from ' . DB::prefix(PLUGIN_PREFIX) . ' where user_id = %d AND id <> %d', [$data->user_id, $data->id]);
 
-        Template::success('You have successfully verified your email address. You can now proceed to the account page.', true);
+        Template::success(__('You have successfully verified your email address. You can now proceed to the account page.', 'verifywoo'), true);
     }
 }

@@ -16,40 +16,49 @@ class Router {
         return $_POST['_method'] ?? $_SERVER['REQUEST_METHOD'];
     }
 
-    public static function get($action, $callback) {
-        self::add('GET', $action, $callback);
+    public static function get($page, $action, $callback) {
+        self::add($page, 'GET', $action, $callback);
     }
 
-    public static function post($action, $callback) {
-        self::add('POST', $action, $callback);
+    public static function post($page, $action, $callback) {
+        self::add($page, 'POST', $action, $callback);
     }
 
-    public static function add($method, $action, $callback) {
+    public static function all($page, $action, $callback) {
+        self::add($page, '*', $action, $callback);
+    }
+
+    public static function add($page, $method,  $action, $callback) {
         self::$routes[] = [
             'method' => strtoupper($method),
+            'page' => $page,
             'action' => $action,
             'callback' => $callback
         ];
     }
 
-    public static function resolve() {
+    public static function resolve($page) {
         $action = $_GET['action'] ?? $_POST['action'] ?? null;
         $method = self::getMethod();
-        $matched = false;
         foreach (self::$routes as $route) {
-            if ($route['method'] === $method && $route['action'] === $action) {
+            if (self::match($route, $method, $page, $action)) {
                 self::call($route['callback']);
-                $matched = true;
                 break;
             }
         }
+    }
 
-        if (!$matched) {
-            Template::include('actions/message', [
-                'type' => 'info',
-                'msg' => 'Nothing to do here yet.'
-            ]);
+    static function match($route, $method, $page, $action) {
+        if (
+            ($route['method'] === $method && $route['action'] === $action && $route['page'] === $page) ||
+            ($route['method'] === '*' && $route['action'] === $action && $route['page'] === $page) ||
+            ($route['method'] === $method && $route['action'] === '*' && $route['page'] === $page) ||
+            ($route['method'] === '*' && $route['action'] === '*' && $route['page'] === $page) ||
+            ($route['method'] === '*' && $route['action'] === '*' && $route['page'] === '*')
+        ) {
+            return true;
         }
+        return false;
     }
 
     private static function call($controller) {
