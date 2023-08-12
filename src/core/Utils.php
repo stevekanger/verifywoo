@@ -15,7 +15,7 @@ class Utils {
                 if (is_array($item) || is_object($item)) {
                     error_log(print_r($item, true));
                 } else {
-                    error_log($item);
+                    error_log($item ?? '');
                 }
             }
         }

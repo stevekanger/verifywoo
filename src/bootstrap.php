@@ -9,9 +9,9 @@ use VerifyWoo\Core\Plugin;
 use VerifyWoo\Core\Session;
 use VerifyWoo\Controllers\Admin\AdminSettings;
 use VerifyWoo\Controllers\Admin\WooSettings;
-use VerifyWoo\Controllers\App\Events\InfoChange;
-use VerifyWoo\Controllers\App\Events\Login;
-use VerifyWoo\Controllers\App\Events\Registration;
+use VerifyWoo\Controllers\App\InfoChange;
+use VerifyWoo\Controllers\App\Login;
+use VerifyWoo\Controllers\App\Registration;
 
 defined('ABSPATH') || exit;
 
@@ -37,8 +37,8 @@ add_action('admin_init', [AdminSettings::class, 'add_settings_sections']);
 add_action('init', [AdminSettings::class, 'register_settings']);
 
 // Handle Registration Events
-add_action('woocommerce_created_customer', [Registration::class, 'on_registration'], 10, 3);
-add_filter('woocommerce_registration_redirect', [Registration::class, 'on_registration_redirect']);
+add_action('user_register', [Registration::class, 'on_registration'], 10, 2);
+add_filter('woocommerce_registration_auth_new_customer', [Registration::class, 'woocommerce_registration_auth_new_customer']);
 add_action('woocommerce_register_form', [Registration::class, 'include_retype_password_input']);
 add_filter('woocommerce_registration_errors', [Registration::class, 'on_registration_password_validation'], 10, 3);
 
@@ -49,4 +49,5 @@ add_filter('woocommerce_save_account_details_errors', [InfoChange::class, 'on_em
 add_filter('woocommerce_process_login_errors', [Login::class, 'on_login'], 10, 3);
 
 // Include Routes
-require PLUGIN_ROOT_DIR . '/src/routes/verification.php';
+require PLUGIN_ROOT_DIR . '/src/routes/email-verification.php';
+require PLUGIN_ROOT_DIR . '/src/routes/admin-users.php';

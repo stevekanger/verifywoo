@@ -12,5 +12,11 @@
       "name": "SteveKanger"
     }
   ],
+  "scripts": {
+    "dev": [
+      "Composer\\Config::disableProcessTimeout",
+      "cd ../../../ && php -S localhost:5000"
+    ]
+  },
   "require": {}
 }

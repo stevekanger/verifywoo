@@ -22,7 +22,7 @@ class DB {
             user_id bigint(20) UNSIGNED NOT NULL,
             email varchar(255) UNIQUE NOT NULL,
             token varchar(100) UNIQUE DEFAULT NULL,
-            timestamp bigint(20) DEFAULT NULL,
+            expires bigint(20) DEFAULT NULL,
             verified boolean NOT NULL DEFAULT false,
             FOREIGN KEY (user_id) REFERENCES ' . $wpdb->prefix . 'users (ID) ON DELETE CASCADE 
         ) AUTO_INCREMENT=1, ' . $charset_collate . ';';
@@ -41,17 +41,26 @@ class DB {
         return $wpdb->update(self::prefix(PLUGIN_PREFIX), $data, $where, $format, $where_format);
     }
 
-    public static function get_row($query, $params) {
+    public static function get_var($query, $params = null) {
         global $wpdb;
-        return $wpdb->get_row(
-            $wpdb->prepare($query, $params)
+        return $wpdb->get_var(
+            self::prepare($query, $params)
         );
     }
 
-    public static function get_results($query, $params) {
+    public static function get_row($query, $params = null) {
+        global $wpdb;
+        return $wpdb->get_row(
+            self::prepare($query, $params),
+            ARRAY_A
+        );
+    }
+
+    public static function get_results($query, $params = null) {
         global $wpdb;
         return $wpdb->get_results(
-            $wpdb->prepare($query, $params)
+            self::prepare($query, $params),
+            ARRAY_A
         );
     }
 
@@ -60,10 +69,15 @@ class DB {
         return $wpdb->delete(self::prefix(PLUGIN_PREFIX), $where, $where_format);
     }
 
-    public static function query($query, $params) {
+    public static function prepare($query, $params = null) {
+        global $wpdb;
+        return $params ? $wpdb->prepare($query, $params) : $query;
+    }
+
+    public static function query($query, $params = null) {
         global $wpdb;
         return $wpdb->query(
-            $wpdb->prepare($query, $params)
+            self::prepare($query, $params)
         );
     }
 }

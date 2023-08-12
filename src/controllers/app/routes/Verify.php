@@ -5,6 +5,8 @@ namespace VerifyWoo\Controllers\App\Routes;
 use Verifywoo\Core\Template;
 use VerifyWoo\Core\Token;
 use VerifyWoo\Core\DB;
+use VerifyWoo\Core\User;
+use WP_Error;
 
 use const VerifyWoo\PLUGIN_PREFIX;
 
@@ -18,24 +20,16 @@ class Verify {
         if (!$data) return Template::error(__('There was an issue verifying your token.', 'verifywoo'));
 
 
-        if ($data->email && $data->user_id) {
-            wp_update_user([
-                'ID' => $data->user_id,
-                'user_email' => $data->email
-            ]);
+        if ($data['email'] && $data['user_id']) {
+            $updated_email = User::update_email($data['user_id'], $data['email']);
+
+            if ($updated_email instanceof WP_Error) return Template::error(__('There was an issue saving your new email information. Please contact your site administrator.', 'verifywoo'));
         }
 
-        $updated = DB::update([
-            'token' => null,
-            'timestamp' => null,
-            'verified' => true,
-        ], [
-            'user_id' => $data->user_id
-        ]);
-
+        $updated = User::verify($data['user_id']);
         if (!$updated) return Template::error(__('There was an issue verifying your token.', 'verifywoo'));
 
-        DB::query('DELETE from ' . DB::prefix(PLUGIN_PREFIX) . ' where user_id = %d AND id <> %d', [$data->user_id, $data->id]);
+        DB::query('DELETE from ' . DB::prefix(PLUGIN_PREFIX) . ' where user_id = %d AND id <> %d', [$data['user_id'], $data['id']]);
 
         Template::success(__('You have successfully verified your email address. You can now proceed to the account page.', 'verifywoo'), true);
     }

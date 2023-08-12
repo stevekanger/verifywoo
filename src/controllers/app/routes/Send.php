@@ -18,21 +18,19 @@ class Send {
     public function post() {
         $email = $_POST['email'] ?? null;
 
-        if (!$email) return Template::error(__('Email is required', 'verifywoo'));
+        if (!$email) return Template::error(__('Email is required.', 'verifywoo'));
 
         $query = DB::get_row('SELECT id, verified from ' . DB::prefix(PLUGIN_PREFIX) . ' where email = %s', $email);
 
         if (!$query) return Template::error(__('There is no user with that email registered.', 'verifywoo'));
-        if ($query->verified) return Template::error(__('That email is already registered.', 'verifywoo'));
+        if ($query['verified']) return Template::error(__('That email is already verified.', 'verifywoo'));
 
         $token = Token::create();
-        $timestamp = time();
-
         $inserted = DB::update([
             'token' => $token,
-            'timestamp' => $timestamp
+            'expires' => Token::set_exp()
         ], [
-            'id' => $query->id
+            'id' => $query['id']
         ]);
 
         if (!$inserted) return Template::error(__('There was an error creating your verification data. Please try again. If the problem persists contact your site administrator.', 'verifywoo'));

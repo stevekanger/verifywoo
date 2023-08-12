@@ -10,8 +10,8 @@ defined('ABSPATH') || exit;
 class Plugin {
     static $pages = [
         'verification' => [
-            'post_title' => 'Verification',
-            'post_name' => 'verification',
+            'post_title' => 'Email Verification',
+            'post_name' => 'email-verification',
             'post_state' => PLUGIN_NAME . ' Verification Page'
         ]
     ];
@@ -57,8 +57,8 @@ class Plugin {
     }
 
     public static function add_woocommerce_page_class($classes) {
-        foreach (self::$pages as $key => $value) {
-            if (is_page($key)) {
+        foreach (self::$pages as $page) {
+            if (is_page($page['post_name'])) {
                 $classes[] = 'woocommerce-page';
             }
         }

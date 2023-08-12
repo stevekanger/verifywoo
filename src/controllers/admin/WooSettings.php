@@ -30,7 +30,7 @@ class WooSettings {
     }
 
     public static function configure_woocommerce_email_settings($settings) {
-        $settings['WC_Email_Customer_New_Account'] = include PLUGIN_ROOT_DIR . '/src/overrides/class-override-wc-email-customer-new-account.php';
+        $settings['WC_Email_Customer_New_Account'] = include PLUGIN_ROOT_DIR . '/src/controllers/admin/Override_WC_Email_Customer_New_Account.php';
         return $settings;
     }
 

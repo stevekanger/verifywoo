@@ -7,9 +7,18 @@ defined('ABSPATH') || exit;
 class Router {
     static $routes = [];
 
-    public static function redirect($path) {
-        wp_redirect(home_url() . $path);
+    public static function redirect($url) {
+        wp_redirect($url);
         exit;
+    }
+
+    public static function redirect_to_permalink($post_name, $search_params = []) {
+        self::redirect(self::get_page_permalink($post_name, $search_params));
+    }
+
+    public static function get_page_permalink($post_name, $search_params = []) {
+        $permalink = get_permalink(get_page_by_path($post_name));
+        return add_query_arg($search_params, $permalink);
     }
 
     public static function getMethod() {
@@ -22,10 +31,6 @@ class Router {
 
     public static function post($page, $action, $callback) {
         self::add($page, 'POST', $action, $callback);
-    }
-
-    public static function all($page, $action, $callback) {
-        self::add($page, '*', $action, $callback);
     }
 
     public static function add($page, $method,  $action, $callback) {

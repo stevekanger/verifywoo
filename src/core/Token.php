@@ -19,13 +19,17 @@ class Token {
         $data = DB::get_row('SELECT * from ' . DB::prefix(PLUGIN_PREFIX) . ' where token = %s', $token);
         if (!$data) return null;
 
-        $timestamp = $data->timestamp ?? null;
-        if (!$timestamp || !self::verify_timestamp($timestamp)) return null;
+        $expires = $data['expires'] ?? null;
+        if (!$expires || !self::verify_exp($expires)) return null;
 
         return $data;
     }
 
-    static function verify_timestamp($timestamp) {
-        return (strtotime('+1 hour', $timestamp) - strtotime('now')) > 0 ? true : false;
+    static function set_exp() {
+        return strtotime('+' . get_option(PLUGIN_PREFIX . '_verification_expiration_length'), time());
+    }
+
+    static function verify_exp($expires) {
+        return time() < $expires;
     }
 }

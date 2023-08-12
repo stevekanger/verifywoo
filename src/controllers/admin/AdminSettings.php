@@ -2,16 +2,18 @@
 
 namespace VerifyWoo\Controllers\Admin;
 
+use const VerifyWoo\PLUGIN_PREFIX;
+
+use VerifyWoo\Core\DB;
 use VerifyWoo\Core\Template;
 use VerifyWoo\Core\Utils;
-
-use const VerifyWoo\PLUGIN_PREFIX;
 
 defined('ABSPATH') || exit;
 
 class AdminSettings {
     public static function admin_menu() {
-        add_menu_page(__('Verify Woo', 'verifywoo'), __('Verify Woo', 'verifywoo'), 'activate_plugins', PLUGIN_PREFIX, [self::class, 'admin_page_callback'], 'dashicons-shield', 55.5);
+        add_menu_page(__('Verify Woo', 'verifywoo'), __('Verify Woo', 'verifywoo'), 'activate_plugins', PLUGIN_PREFIX, [self::class, 'admin_settings_page_callback'], 'dashicons-shield', 55.5);
+        add_submenu_page(PLUGIN_PREFIX, __('Verify Woo Users', 'verifywoo'), __('Users', 'verifywoo'), 'activate_plugins', PLUGIN_PREFIX . '-users', [self::class, 'admin_users_page_callback']);
     }
 
     public static function add_settings_sections() {
@@ -34,6 +36,44 @@ class AdminSettings {
             }
         }
     }
+
+    public static function admin_settings_page_callback() {
+        Template::include('admin/page-settings');
+    }
+
+    public static function admin_users_page_callback() {
+        Template::include('admin/page-users');
+    }
+
+    public static function settings_section_callback($data) {
+        echo '<p>' . $data['description'] ?? null . '</p>';
+    }
+
+    public static function add_settings_field_callback($data) {
+        Template::include($data['template'], $data);
+    }
+
+    // public static function manage_users_columns($columns) {
+    //     $columns['email_verified'] = __('Email Verified', 'verifywoo');
+    //     return $columns;
+    // }
+
+    // public static function manage_users_custom_column($val, $column_name, $user_id) {
+    //     if ($column_name !== 'email_verified') return $val;
+
+    //     $email = get_user_by('id', $user_id)->user_email;
+    //     $verified_query = DB::get_row('SELECT verified from ' . DB::prefix(PLUGIN_PREFIX) . ' where email = %s', $email);
+    //     if (!$verified_query) return 0;
+    //     return $verified_query->verified;
+    // }
+
+    // public static function show_user_profile($profile) {
+    //     Utils::debug($profile);
+    // }
+
+    // public static function edit_user_profile($profile) {
+    //     Utils::debug($profile);
+    // }
 
     private static function get_settings() {
         return  [
@@ -157,7 +197,7 @@ class AdminSettings {
                         'description' => ($description = __('The text to be displayed in the heading of the verification email.', 'verifywoo')),
                         'register_data' => [
                             'type' => 'string',
-                            'default' => __('Verify your email', 'verifywoo'),
+                            'default' => get_bloginfo('title'),
                             'description' => $description,
                             'show_in_rest' => true
                         ],
@@ -194,17 +234,5 @@ class AdminSettings {
                 ]
             ]
         ];
-    }
-
-    public static function admin_page_callback() {
-        Template::include('admin/admin-page');
-    }
-
-    public static function settings_section_callback($data) {
-        echo $data['description'] ?? null;
-    }
-
-    public static function add_settings_field_callback($data) {
-        Template::include($data['template'], $data);
     }
 }
