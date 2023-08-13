@@ -1,6 +1,6 @@
 <?php
 
-namespace VerifyWoo\Controllers\App;
+namespace VerifyWoo\Inc\App;
 
 use const VerifyWoo\PLUGIN_PREFIX;
 use VerifyWoo\Core\DB;

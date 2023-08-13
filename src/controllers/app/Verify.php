@@ -1,6 +1,6 @@
 <?php
 
-namespace VerifyWoo\Controllers\App\Routes;
+namespace VerifyWoo\Controllers\App;
 
 use Verifywoo\Core\Template;
 use VerifyWoo\Core\Token;

@@ -1,6 +1,6 @@
 <?php
 
-namespace VerifyWoo\Controllers\Admin;
+namespace VerifyWoo\Inc\Admin;
 
 use const VerifyWoo\PLUGIN_NAME;
 use const VerifyWoo\PLUGIN_PREFIX;
@@ -30,7 +30,7 @@ class WooSettings {
     }
 
     public static function configure_woocommerce_email_settings($settings) {
-        $settings['WC_Email_Customer_New_Account'] = include PLUGIN_ROOT_DIR . '/src/controllers/admin/Override_WC_Email_Customer_New_Account.php';
+        $settings['WC_Email_Customer_New_Account'] = include PLUGIN_ROOT_DIR . '/src/inc/admin/Override_WC_Email_Customer_New_Account.php';
         return $settings;
     }
 

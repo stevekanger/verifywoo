@@ -3,6 +3,10 @@
   "description": "Simple user email verification for woocommerce",
   "type": "project",
   "autoload": {
+    "files": [
+      "src/bootstrap.php",
+      "src/routes/index.php"
+    ],
     "psr-4": {
       "VerifyWoo\\": "src/"
     }

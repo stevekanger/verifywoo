@@ -16,7 +16,8 @@ class Session {
             'registration_action' => [
                 'action' => 'success',
                 'msg' => urlencode(__('You have successfully registered. Please check the email you provided to verify your email address.', 'verifywoo'))
-            ]
+            ],
+            'admin_selected_users' => []
         ];
     }
 

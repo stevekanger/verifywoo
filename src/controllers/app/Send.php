@@ -1,6 +1,6 @@
 <?php
 
-namespace VerifyWoo\Controllers\App\Routes;
+namespace VerifyWoo\Controllers\App;
 
 use const VerifyWoo\PLUGIN_PREFIX;
 use VerifyWoo\Core\DB;

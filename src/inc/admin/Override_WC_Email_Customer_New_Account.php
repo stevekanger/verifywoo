@@ -1,6 +1,6 @@
 <?php
 
-namespace VerifyWoo\Controllers\Admin;
+namespace VerifyWoo\Inc\Admin;
 
 use const VerifyWoo\PLUGIN_NAME;
 use WC_Email_Customer_New_Account;

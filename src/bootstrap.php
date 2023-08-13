@@ -3,15 +3,14 @@
 namespace VerifyWoo;
 
 use const VerifyWoo\PLUGIN_ROOT_FILE;
-use const VerifyWoo\PLUGIN_ROOT_DIR;
 
 use VerifyWoo\Core\Plugin;
 use VerifyWoo\Core\Session;
-use VerifyWoo\Controllers\Admin\AdminSettings;
-use VerifyWoo\Controllers\Admin\WooSettings;
-use VerifyWoo\Controllers\App\InfoChange;
-use VerifyWoo\Controllers\App\Login;
-use VerifyWoo\Controllers\App\Registration;
+use VerifyWoo\Inc\Admin\AdminSettings;
+use VerifyWoo\Inc\Admin\WooSettings;
+use VerifyWoo\Inc\App\InfoChange;
+use VerifyWoo\Inc\App\Login;
+use VerifyWoo\Inc\App\Registration;
 
 defined('ABSPATH') || exit;
 
@@ -47,7 +46,3 @@ add_filter('woocommerce_save_account_details_errors', [InfoChange::class, 'on_em
 
 // Handle Login Events
 add_filter('woocommerce_process_login_errors', [Login::class, 'on_login'], 10, 3);
-
-// Include Routes
-require PLUGIN_ROOT_DIR . '/src/routes/email-verification.php';
-require PLUGIN_ROOT_DIR . '/src/routes/admin-users.php';

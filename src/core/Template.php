@@ -52,4 +52,10 @@ class Template {
             'hide_resend' => $hide_resend
         ]);
     }
+
+    public static function admin_message($msg) {
+        self::include('admin/actions/message', [
+            'msg' => $msg
+        ]);
+    }
 }

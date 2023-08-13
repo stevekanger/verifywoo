@@ -1,12 +1,10 @@
 <?php
 
-namespace VerifyWoo\Controllers\Admin;
+namespace VerifyWoo\Inc\Admin;
 
 use const VerifyWoo\PLUGIN_PREFIX;
 
-use VerifyWoo\Core\DB;
 use VerifyWoo\Core\Template;
-use VerifyWoo\Core\Utils;
 
 defined('ABSPATH') || exit;
 
@@ -52,28 +50,6 @@ class AdminSettings {
     public static function add_settings_field_callback($data) {
         Template::include($data['template'], $data);
     }
-
-    // public static function manage_users_columns($columns) {
-    //     $columns['email_verified'] = __('Email Verified', 'verifywoo');
-    //     return $columns;
-    // }
-
-    // public static function manage_users_custom_column($val, $column_name, $user_id) {
-    //     if ($column_name !== 'email_verified') return $val;
-
-    //     $email = get_user_by('id', $user_id)->user_email;
-    //     $verified_query = DB::get_row('SELECT verified from ' . DB::prefix(PLUGIN_PREFIX) . ' where email = %s', $email);
-    //     if (!$verified_query) return 0;
-    //     return $verified_query->verified;
-    // }
-
-    // public static function show_user_profile($profile) {
-    //     Utils::debug($profile);
-    // }
-
-    // public static function edit_user_profile($profile) {
-    //     Utils::debug($profile);
-    // }
 
     private static function get_settings() {
         return  [

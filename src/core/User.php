@@ -2,6 +2,8 @@
 
 namespace VerifyWoo\Core;
 
+use const VerifyWoo\PLUGIN_PREFIX;
+
 defined('ABSPATH') || exit;
 
 class User {

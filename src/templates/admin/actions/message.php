@@ -2,4 +2,4 @@
 
 defined('ABSPATH') || exit; ?>
 
-<h1>Unverify</h1>
+<p><?php echo $data['msg'] ?? '' ?></p>

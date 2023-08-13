@@ -1,10 +1,10 @@
 <?php
 
-namespace VerifyWoo\Controllers\Admin;
+namespace VerifyWoo\Inc\Admin;
 
 use VerifyWoo\Core\DB;
+use VerifyWoo\Core\Router;
 use VerifyWoo\Core\Token;
-use VerifyWoo\Core\Utils;
 use WP_List_Table;
 
 use const VerifyWoo\PLUGIN_PREFIX;
@@ -29,7 +29,6 @@ class UsersListTable extends WP_List_Table {
         $sortable = $this->get_sortable_columns();
 
         $this->_column_headers = array($columns, $hidden, $sortable);
-        // $this->process_bulk_actions();
         $total_items = DB::get_var('SELECT COUNT(id) FROM ' . DB::prefix(PLUGIN_PREFIX));
 
         $paged = $this->get_pagenum();
@@ -38,10 +37,9 @@ class UsersListTable extends WP_List_Table {
         $offset = ($paged * $per_page) - $per_page;
         $where = $this->get_where($token_table);
 
-        // Select verifywoo.verified, verifywoo.email, verifywoo.expires, users.ID, users.user_login where verifywoo.user_id = users.ID limit 25
         $query = "SELECT $token_table.verified, $token_table.email, $token_table.expires, $users_table.ID, $users_table.user_email, $users_table.user_login from $token_table, $users_table WHERE $token_table.user_id = $users_table.ID $where ORDER BY %1s %1s limit %d offset %d";
         $items = DB::get_results($query, [$orderby, $order, $per_page, $offset]);
-        $items = array_map([$this, 'map_token_status'], $items);
+        $items = array_map([$this, 'get_readable_data'], $items);
 
         $this->items = $items;
 
@@ -80,7 +78,7 @@ class UsersListTable extends WP_List_Table {
         }
     }
 
-    private function map_token_status($item) {
+    private function get_readable_data($item) {
         $expires = $item['expires'] ?? null;
         if (!$expires) {
             $item['token_status'] = 'null';
@@ -89,6 +87,9 @@ class UsersListTable extends WP_List_Table {
         } else {
             $item['token_status'] = 'active';
         }
+
+        $item['verified'] = $item['verified'] ? 'yes' : 'no';
+
         return $item;
     }
 
@@ -142,14 +143,14 @@ class UsersListTable extends WP_List_Table {
     }
 
     function column_user_login($user) {
-        $actions = array(
-            'delete' => sprintf('<a href="?page=%s&id=%s&action=delete">%s</a>', $_REQUEST['page'], $user['ID'], __('Delete', 'verifywoo')),
-        );
+        $actions = [];
+        $query_string = Router::get_query_string();
+        $redirect = urlencode(admin_url('admin.php' . $query_string));
 
-        if ($user['verified']) {
-            $actions['unverify'] = sprintf('<a href="?page=%s&id=%s&action=unverify">%s</a>', $_REQUEST['page'], $user['ID'], __('Unverify', 'verifywoo'));
+        if ($user['verified'] === 'yes') {
+            $actions['unverify'] = sprintf('<a href="?%s&id=%s&action=unverify&redirect=%s">%s</a>', $query_string, $user['ID'], $redirect, __('Unverify', 'verifywoo'));
         } else {
-            $actions['verify'] = sprintf('<a href="?page=%s&id=%s&action=verify">%s</a>', $_REQUEST['page'], $user['ID'], __('Verify', 'verifywoo'));
+            $actions['verify'] = sprintf('<a href="?%s&id=%s&action=verify&redirect=%s">%s</a>', $query_string, $user['ID'], $redirect,  __('Verify', 'verifywoo'));
         }
 
         return sprintf(
@@ -183,29 +184,10 @@ class UsersListTable extends WP_List_Table {
 
 
     function get_bulk_actions() {
-        if (!current_user_can('delete_users'))  return [];
-
         $actions = [
-            'delete' => __('Delete', 'verifywoo'),
             'verify' => __('Verify', 'verifywoo'),
             'unverify' => __('Unverify', 'verifywoo'),
         ];
         return $actions;
-    }
-
-    function process_bulk_action() {
-        if (!current_user_can('delete_users')) return;
-
-        // global $wpdb;
-        // $table_name = DB::prefix(PLUGIN_PREFIX);
-
-        // if ('delete' === $this->current_action()) {
-        //     $ids = isset($_REQUEST['id']) ? $_REQUEST['id'] : array();
-        //     if (is_array($ids)) $ids = implode(',', $ids);
-
-        //     if (!empty($ids)) {
-        //         $wpdb->query("DELETE FROM $table_name WHERE id IN($ids)");
-        //     }
-        // }
     }
 }

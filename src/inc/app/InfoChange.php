@@ -1,6 +1,6 @@
 <?php
 
-namespace VerifyWoo\Controllers\App;
+namespace VerifyWoo\Inc\App;
 
 use VerifyWoo\Core\DB;
 use VerifyWoo\Core\Mail;

@@ -21,6 +21,16 @@ class Router {
         return add_query_arg($search_params, $permalink);
     }
 
+    public static function get_query_string($request = null) {
+        $request = $request ?? $_REQUEST;
+        $str = '?';
+        foreach ($request as $key => $val) {
+            $str = $str . $key . '=' . $val . '&';
+        }
+
+        return rtrim($str, '&');
+    }
+
     public static function getMethod() {
         return $_POST['_method'] ?? $_SERVER['REQUEST_METHOD'];
     }
