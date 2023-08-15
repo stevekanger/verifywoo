@@ -12,7 +12,7 @@ defined('ABSPATH') || exit; ?>
 <p><?php echo get_option(PLUGIN_PREFIX . '_verification_email_content') ?></p>
 
 <?php $link_uri = Router::get_page_permalink('email-verification', [
-    'action' => 'verify',
+    'view' => 'verify',
     'token' => $data['token'] ?? null
 ]) ?>
 

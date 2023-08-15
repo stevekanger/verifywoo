@@ -3,11 +3,10 @@
 namespace VerifyWoo\Inc\Admin;
 
 use VerifyWoo\Core\DB;
+use VerifyWoo\Core\Users;
 use VerifyWoo\Core\Router;
 use VerifyWoo\Core\Token;
 use WP_List_Table;
-
-use const VerifyWoo\PLUGIN_PREFIX;
 
 class UsersListTable extends WP_List_Table {
     public function __construct() {
@@ -20,107 +19,98 @@ class UsersListTable extends WP_List_Table {
     }
 
     public function prepare_items() {
-        $token_table = DB::prefix(PLUGIN_PREFIX);
-        $users_table = DB::prefix('users');
-
-        $per_page = 2;
         $columns = $this->get_columns();
         $hidden = array();
         $sortable = $this->get_sortable_columns();
 
         $this->_column_headers = array($columns, $hidden, $sortable);
-        $total_items = DB::get_var('SELECT COUNT(id) FROM ' . DB::prefix(PLUGIN_PREFIX));
 
+        $limit = 2;
         $paged = $this->get_pagenum();
+        $offset = ($paged * $limit) - $limit;
+
         $orderby = $this->get_orderby();
         $order = strtoupper($_REQUEST['order'] ?? 'asc');
-        $offset = ($paged * $per_page) - $per_page;
-        $where = $this->get_where($token_table);
+        $where = $this->get_where();
 
-        $query = "SELECT $token_table.verified, $token_table.email, $token_table.expires, $users_table.ID, $users_table.user_email, $users_table.user_login from $token_table, $users_table WHERE $token_table.user_id = $users_table.ID $where ORDER BY %1s %1s limit %d offset %d";
-        $items = DB::get_results($query, [$orderby, $order, $per_page, $offset]);
-        $items = array_map([$this, 'get_readable_data'], $items);
+        $total_items = Users::count($where);
+        $items = Users::get_multiple(compact('orderby', 'order', 'limit', 'offset', 'where'));
 
         $this->items = $items;
 
         $this->set_pagination_args(array(
             'total_items' => $total_items,
-            'per_page' => $per_page,
-            'total_pages' => ceil($total_items / $per_page)
+            'limit' => $limit,
+            'total_pages' => ceil($total_items / $limit)
         ));
     }
 
-    private function get_where($token_table) {
+    private function get_where() {
+        $search = $_REQUEST['s'] ?? null;
         $status = $_REQUEST['status'] ?? null;
-        switch ($status) {
-            case 'verified':
-                return "AND $token_table.verified = true";
-            case 'unverified':
-                return "AND $token_table.verified = false";
-            case 'active':
-                return DB::prepare("AND $token_table.expires > %d", [time()]);
-            case 'expired':
-                return DB::prepare("AND $token_table.expires < %d", [time()]);
-            default:
-                return '';
+        $now = time();
+        list($users_table, $tokens_table) = DB::tables('users', 'tokens');
+
+        if ($search) {
+            return DB::prepare("$users_table.user_email LIKE '%%%s%%' OR $users_table.user_login LIKE '%%%s%%'", [$search, $search]);
+        } else if ($status === 'verified') {
+            return "$tokens_table.verified = true";
+        } else if ($status === 'unverified') {
+            return "$tokens_table.verified = false OR $tokens_table.verified is NULL";
+        } else if ($status === 'active') {
+            return "$tokens_table.expires > $now";
+        } else if ($status === 'expired') {
+            return "$tokens_table.expires < $now";
+        } else {
+            return null;
         }
     }
 
     private function get_orderby() {
         $orderby = $_REQUEST['orderby'] ?? null;
+        $users_table = DB::table('users');
+
         switch ($orderby) {
             case 'user_login':
-                return DB::prefix('users') . '.user_login';
+                return "$users_table.user_login";
             case 'email':
-                return DB::prefix(PLUGIN_PREFIX) . '.email';
+                return "$users_table.user_email";
             default:
-                return DB::prefix('users') . '.ID';
+                return "$users_table.ID";
         }
-    }
-
-    private function get_readable_data($item) {
-        $expires = $item['expires'] ?? null;
-        if (!$expires) {
-            $item['token_status'] = 'null';
-        } else if (!Token::verify_exp($expires)) {
-            $item['token_status'] = 'expired';
-        } else {
-            $item['token_status'] = 'active';
-        }
-
-        $item['verified'] = $item['verified'] ? 'yes' : 'no';
-
-        return $item;
     }
 
     protected function get_views() {
-        $table = DB::prefix(PLUGIN_PREFIX);
+        $tokens_table = DB::table();
+
         $status = $_REQUEST['status'] ?? null;
+        $now = time();
+
         $links = [
             [
                 'status' => 'all',
                 'current' => !$status || ($status === 'all'),
-                'count' => DB::get_var("SELECT count(*) from $table"),
+                'count' => Users::count(),
             ],
             [
                 'status' => 'verified',
                 'current' => $status === 'verified',
-                'count' => DB::get_var("SELECT count(*) from $table where verified = true"),
+                'count' => Users::count("$tokens_table.verified = true"),
             ],
             [
                 'status' => 'unverified',
                 'current' => $status === 'unverified',
-                'count' => DB::get_var("SELECT count(*) from $table where verified = false"),
+                'count' => Users::count("NOT $tokens_table.verified OR $tokens_table.verified is NULL"),
             ],
             [
                 'status' => 'active',
                 'current' => $status === 'active',
-                'count' => DB::get_var("SELECT count(*) from $table where expires > %d", [time()])
+                'count' =>  Users::count("$tokens_table.expires > $now")
             ],
             [
                 'status' => 'expired',
                 'current' => $status === 'expired',
-                'count' => DB::get_var("SELECT count(*) from $table where expires < %d", [time()])
+                'count' => Users::count("$tokens_table.expires < $now")
             ]
         ];
 
@@ -137,20 +127,26 @@ class UsersListTable extends WP_List_Table {
 
     function column_cb($user) {
         return sprintf(
-            '<input type="checkbox" name="id[]" value="%s" />',
+            '<input type="checkbox" name="ids[]" value="%s" />',
             $user['ID']
         );
     }
 
     function column_user_login($user) {
         $actions = [];
-        $query_string = Router::get_query_string();
-        $redirect = urlencode(admin_url('admin.php' . $query_string));
+        $page = $_REQUEST['page'];
+        $current_query = Router::get_query_string();
+        $built_query = http_build_query([
+            'redirect' => admin_url('admin.php' . $current_query),
+            'ids' => [($user['ID'])]
+        ]);
+
+        $actions['delete'] = sprintf('<a href="?page=%s&action=delete&view=selection-table&%s">%s</a>', $page, $built_query, __('Delete', 'verifywoo'));
 
         if ($user['verified'] === 'yes') {
-            $actions['unverify'] = sprintf('<a href="?%s&id=%s&action=unverify&redirect=%s">%s</a>', $query_string, $user['ID'], $redirect, __('Unverify', 'verifywoo'));
+            $actions['unverify'] = sprintf('<a href="?page=%s&action=unverify&view=selection-table&%s">%s</a>', $page, $built_query, __('Unverify', 'verifywoo'));
         } else {
-            $actions['verify'] = sprintf('<a href="?%s&id=%s&action=verify&redirect=%s">%s</a>', $query_string, $user['ID'], $redirect,  __('Verify', 'verifywoo'));
+            $actions['verify'] = sprintf('<a href="?page=%s&action=verify&view=selection-table&%s">%s</a>', $page, $built_query, __('Verify', 'verifywoo'));
         }
 
         return sprintf(
@@ -160,14 +156,35 @@ class UsersListTable extends WP_List_Table {
         );
     }
 
+    function column_verified($user) {
+        return $user['verified'] ? '<span style="color: #008000" class="dashicons dashicons-yes"></span>' : '<span style="color: #ff0000" class="dashicons dashicons-no"></span>';
+    }
+
+    function column_token_status($item) {
+        $expires = $item['expires'] ?? null;
+
+        if (!$expires) {
+            return 'null';
+        } else if (!Token::verify_exp($expires)) {
+            return '<b style="color: #ff0000">Expired</b>';
+        } else {
+            return '<b style="color: #008000">Active</b>';
+        }
+    }
+
+    function column_roles($user) {
+        return implode(', ', array_keys($user['roles'] ?? []));
+    }
+
     function get_columns() {
         $columns = array(
             'cb' => '<input type="checkbox" />',
             'user_login' => __('Username', 'verifywoo'),
             'ID' => __('User ID', 'verifywoo'),
-            'email' => __('Email', 'verifywoo'),
+            'user_email' => __('Email', 'verifywoo'),
             'verified' => __('Verified', 'verifywoo'),
-            'token_status' => __('Token Status', 'verifywoo')
+            'token_status' => __('Token Status', 'verifywoo'),
+            'roles' => __('Roles', 'verifywoo')
         );
         return $columns;
     }
@@ -185,6 +202,7 @@ class UsersListTable extends WP_List_Table {
 
     function get_bulk_actions() {
         $actions = [
+            'delete' => __('Delete', 'verifywoo'),
             'verify' => __('Verify', 'verifywoo'),
             'unverify' => __('Unverify', 'verifywoo'),
         ];

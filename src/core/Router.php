@@ -7,13 +7,15 @@ defined('ABSPATH') || exit;
 class Router {
     static $routes = [];
 
-    public static function redirect($url) {
-        wp_redirect($url);
-        exit;
-    }
+    public static function redirect($how, $value, $params = []) {
+        if ($how === 'url') {
+            wp_redirect($value);
+            exit;
+        }
 
-    public static function redirect_to_permalink($post_name, $search_params = []) {
-        self::redirect(self::get_page_permalink($post_name, $search_params));
+        $permalink = self::get_page_permalink($value, $params);
+        wp_redirect($permalink);
+        exit;
     }
 
     public static function get_page_permalink($post_name, $search_params = []) {
@@ -35,41 +37,41 @@ class Router {
         return $_POST['_method'] ?? $_SERVER['REQUEST_METHOD'];
     }
 
-    public static function get($page, $action, $callback) {
-        self::add($page, 'GET', $action, $callback);
+    public static function get($page, $view, $callback) {
+        self::add($page, 'GET', $view, $callback);
     }
 
-    public static function post($page, $action, $callback) {
-        self::add($page, 'POST', $action, $callback);
+    public static function post($page, $view, $callback) {
+        self::add($page, 'POST', $view, $callback);
     }
 
-    public static function add($page, $method,  $action, $callback) {
+    public static function add($page, $method,  $view, $callback) {
         self::$routes[] = [
             'method' => strtoupper($method),
             'page' => $page,
-            'action' => $action,
+            'view' => $view,
             'callback' => $callback
         ];
     }
 
     public static function resolve($page) {
-        $action = $_GET['action'] ?? $_POST['action'] ?? null;
+        $view = $_GET['view'] ?? $_POST['view'] ?? null;
         $method = self::getMethod();
         foreach (self::$routes as $route) {
-            if (self::match($route, $method, $page, $action)) {
+            if (self::match($route, $method, $page, $view)) {
                 self::call($route['callback']);
                 break;
             }
         }
     }
 
-    static function match($route, $method, $page, $action) {
+    static function match($route, $method, $page, $view) {
         if (
-            ($route['method'] === $method && $route['action'] === $action && $route['page'] === $page) ||
-            ($route['method'] === '*' && $route['action'] === $action && $route['page'] === $page) ||
-            ($route['method'] === $method && $route['action'] === '*' && $route['page'] === $page) ||
-            ($route['method'] === '*' && $route['action'] === '*' && $route['page'] === $page) ||
-            ($route['method'] === '*' && $route['action'] === '*' && $route['page'] === '*')
+            ($route['method'] === $method && $route['view'] === $view && $route['page'] === $page) ||
+            ($route['method'] === '*' && $route['view'] === $view && $route['page'] === $page) ||
+            ($route['method'] === $method && $route['view'] === '*' && $route['page'] === $page) ||
+            ($route['method'] === '*' && $route['view'] === '*' && $route['page'] === $page) ||
+            ($route['method'] === '*' && $route['view'] === '*' && $route['page'] === '*')
         ) {
             return true;
         }

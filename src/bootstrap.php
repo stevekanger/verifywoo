@@ -20,8 +20,7 @@ register_deactivation_hook(PLUGIN_ROOT_FILE, [Plugin::class, 'deactivate']);
 
 // Plugin initializations
 add_action('init', [Session::class, 'init']);
-add_action('init', [Plugin::class, 'register_pages']);
-add_action('init', [Plugin::class, 'add_shortcodes']);
+add_action('init', [Plugin::class, 'init']);
 add_filter('display_post_states', [Plugin::class, 'register_pages_post_state'], 10, 2);
 add_filter('body_class', [Plugin::class, 'add_woocommerce_page_class']);
 

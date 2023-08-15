@@ -5,7 +5,7 @@ namespace VerifyWoo\Inc\App;
 use VerifyWoo\Core\Template;
 use VerifyWoo\Core\Router;
 use VerifyWoo\Core\Session;
-use VerifyWoo\Core\User;
+use VerifyWoo\Core\Users;
 
 use const VerifyWoo\PLUGIN_PREFIX;
 
@@ -14,11 +14,11 @@ defined('ABSPATH') || exit;
 class Registration {
     public static function on_registration($user_id, $user_data,) {
         $email = $user_data['user_email'];
-        User::register($user_id, $email);
+        Users::register($user_id, $email);
     }
 
     public static function woocommerce_registration_auth_new_customer($new_customer) {
-        Router::redirect_to_permalink('email-verification', Session::get_item('registration_action'));
+        Router::redirect('permalink', 'email-verification', Session::get_item('registration_redirect'));
     }
 
     public static function on_registration_password_validation($errors, $username, $email) {

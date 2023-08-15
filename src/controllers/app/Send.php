@@ -2,7 +2,6 @@
 
 namespace VerifyWoo\Controllers\App;
 
-use const VerifyWoo\PLUGIN_PREFIX;
 use VerifyWoo\Core\DB;
 use VerifyWoo\Core\Mail;
 use VerifyWoo\Core\Template;
@@ -12,7 +11,7 @@ defined('ABSPATH') || exit;
 
 class Send {
     public function get() {
-        Template::include('app/actions/send-verification');
+        Template::include('app/views/send-verification');
     }
 
     public function post() {
@@ -20,7 +19,7 @@ class Send {
 
         if (!$email) return Template::error(__('Email is required.', 'verifywoo'));
 
-        $query = DB::get_row('SELECT id, verified from ' . DB::prefix(PLUGIN_PREFIX) . ' where email = %s', $email);
+        $query = DB::get_row('SELECT id, verified from ' . DB::table('tokens') . ' where email = %s', $email);
 
         if (!$query) return Template::error(__('There is no user with that email registered.', 'verifywoo'));
         if ($query['verified']) return Template::error(__('That email is already verified.', 'verifywoo'));

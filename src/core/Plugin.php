@@ -24,6 +24,11 @@ class Plugin {
         self::remove_pages();
     }
 
+    public static function init() {
+        self::register_pages();
+        self::add_shortcodes();
+    }
+
     public static function register_pages() {
         foreach (self::$pages as $page) {
             if (get_page_by_path($page['post_name'])) return;

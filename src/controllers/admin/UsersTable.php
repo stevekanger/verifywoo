@@ -6,6 +6,6 @@ use VerifyWoo\Core\Template;
 
 class UsersTable {
     public static function get() {
-        Template::include('admin/actions/users-table');
+        Template::include('admin/views/users-table');
     }
 }

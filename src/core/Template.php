@@ -30,7 +30,7 @@ class Template {
     }
 
     public static function error($msg, $hide_resend = false) {
-        self::include('app/actions/message', [
+        self::include('app/views/message', [
             'type' => 'error',
             'msg' => $msg,
             'hide_resend' => $hide_resend
@@ -38,7 +38,7 @@ class Template {
     }
 
     public static function success($msg, $hide_resend = false) {
-        self::include('app/actions/message', [
+        self::include('app/views/message', [
             'type' => 'message',
             'msg' => $msg,
             'hide_resend' => $hide_resend
@@ -46,7 +46,7 @@ class Template {
     }
 
     public static function info($msg, $hide_resend = false) {
-        self::include('app/actions/message', [
+        self::include('app/views/message', [
             'type' => 'info',
             'msg' => $msg,
             'hide_resend' => $hide_resend
@@ -54,7 +54,7 @@ class Template {
     }
 
     public static function admin_message($msg) {
-        self::include('admin/actions/message', [
+        self::include('admin/views/message', [
             'msg' => $msg
         ]);
     }

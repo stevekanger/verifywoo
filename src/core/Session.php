@@ -13,8 +13,8 @@ class Session {
         }
 
         $_SESSION[PLUGIN_PREFIX] = [
-            'registration_action' => [
-                'action' => 'success',
+            'registration_redirect' => [
+                'view' => 'success',
                 'msg' => urlencode(__('You have successfully registered. Please check the email you provided to verify your email address.', 'verifywoo'))
             ],
             'admin_selected_users' => []
