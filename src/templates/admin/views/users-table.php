@@ -1,7 +1,7 @@
 <?php
 
-use VerifyWoo\Core\Router;
-use VerifyWoo\Inc\Admin\UsersListTable;
+use verifywoo\core\Router;
+use verifywoo\inc\admin\UsersListTable;
 
 defined('ABSPATH') || exit;
 
@@ -10,7 +10,7 @@ $table = new UsersListTable();
 $table->prepare_items();
 $redirect = Router::get_query_string(); ?>
 
-<h1>Users</h1>
+<h1>Users Status</h1>
 <?php $table->views() ?>
 <form method="get">
     <input type="hidden" name="page" value="<?php echo $_REQUEST['page'] ?>" />

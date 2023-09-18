@@ -1,6 +1,6 @@
 <?php
 
-namespace VerifyWoo\Core;
+namespace verifywoo\core;
 
 defined('ABSPATH') || exit;
 

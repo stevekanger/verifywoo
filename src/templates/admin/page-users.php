@@ -1,6 +1,6 @@
 <?php
 
-use VerifyWoo\Core\Router;
+use verifywoo\core\Router;
 
 defined('ABSPATH') || exit;
 

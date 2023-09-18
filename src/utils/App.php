@@ -1,9 +1,9 @@
 <?php
 
-namespace VerifyWoo\Utils;
+namespace verifywoo\utils;
 
-use const VerifyWoo\PLUGIN_PREFIX;
-use VerifyWoo\Core\DB;
+use const verifywoo\PLUGIN_PREFIX;
+use verifywoo\core\DB;
 
 defined('ABSPATH') || exit;
 

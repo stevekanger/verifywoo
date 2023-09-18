@@ -1,8 +1,8 @@
 <?php
 
-namespace VerifyWoo\Controllers\App;
+namespace verifywoo\controllers\app;
 
-use VerifyWoo\Core\Template;
+use verifywoo\core\Template;
 
 defined('ABSPATH') || exit;
 

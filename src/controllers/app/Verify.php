@@ -1,14 +1,14 @@
 <?php
 
-namespace VerifyWoo\Controllers\App;
+namespace verifywoo\controllers\app;
 
-use Verifywoo\Core\Template;
-use VerifyWoo\Core\Token;
-use VerifyWoo\Core\DB;
-use VerifyWoo\Core\Users;
+use verifywoo\core\Template;
+use verifywoo\core\Token;
+use verifywoo\core\DB;
+use verifywoo\core\Users;
 use WP_Error;
 
-use const VerifyWoo\PLUGIN_PREFIX;
+use const verifywoo\PLUGIN_PREFIX;
 
 defined('ABSPATH') || exit;
 

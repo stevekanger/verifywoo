@@ -8,7 +8,7 @@
       "src/routes/index.php"
     ],
     "psr-4": {
-      "VerifyWoo\\": "src/"
+      "verifywoo\\": "src/"
     }
   },
   "authors": [

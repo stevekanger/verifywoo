@@ -1,13 +1,13 @@
 <?php
 
-namespace VerifyWoo\Inc\App;
+namespace verifywoo\inc\app;
 
-use VerifyWoo\Core\DB;
-use VerifyWoo\Core\Mail;
-use VerifyWoo\Core\Router;
-use VerifyWoo\Core\Token;
+use verifywoo\core\DB;
+use verifywoo\core\Mail;
+use verifywoo\core\Router;
+use verifywoo\core\Token;
 
-use const VerifyWoo\PLUGIN_PREFIX;
+use const verifywoo\PLUGIN_PREFIX;
 
 defined('ABSPATH') || exit;
 

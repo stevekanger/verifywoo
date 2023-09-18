@@ -1,8 +1,8 @@
 <?php
 
-namespace VerifyWoo\Controllers\Admin;
+namespace verifywoo\controllers\admin;
 
-use VerifyWoo\Core\Template;
+use verifywoo\core\Template;
 
 class UsersTable {
     public static function get() {

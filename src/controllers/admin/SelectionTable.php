@@ -1,11 +1,10 @@
 <?php
 
-namespace VerifyWoo\Controllers\Admin;
+namespace verifywoo\controllers\admin;
 
-use VerifyWoo\Core\Template;
-use VerifyWoo\Core\Router;
-use VerifyWoo\Core\Utils;
-use VerifyWoo\Core\Users;
+use verifywoo\core\Template;
+use verifywoo\core\Router;
+use verifywoo\core\Users;
 
 defined('ABSPATH') || exit;
 
@@ -29,24 +28,25 @@ class SelectionTable {
 
         $action = $_REQUEST['action'] ?? null;
 
-        Utils::debug($users);
-
-        // switch ($action) {
-        //     case 'delete':
-        //         foreach ($users as $user) {
-        //             Users::delete($user['ID']);
-        //         }
-        //         break;
-        //     case 'verify':
-        //         foreach ($users as $user) {
-        //             Users::verify($user['ID']);
-        //         }
-        //         break;
-        //     case 'unverify':
-        //         foreach ($users as $user) {
-        //             Users::unverify($user['ID']);
-        //         }
-        // }
+        switch ($action) {
+            case 'delete':
+                foreach ($users as $user) {
+                    $can_delete = get_option('admin_email') !== $user['user_email'];
+                    if (!$can_delete) {
+                        continue;
+                    }
+                }
+                break;
+            case 'verify':
+                foreach ($users as $user) {
+                    Users::verify($user['ID']);
+                }
+                break;
+            case 'unverify':
+                foreach ($users as $user) {
+                    Users::unverify($user['ID']);
+                }
+        }
 
         Router::redirect('url', $redirect);
     }

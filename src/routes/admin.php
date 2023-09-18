@@ -1,10 +1,10 @@
 <?php
 
-namespace VerifyWoo\Routes;
+namespace verifywoo\routes;
 
-use VerifyWoo\Core\Router;
-use VerifyWoo\Controllers\Admin\SelectionTable;
-use VerifyWoo\Controllers\Admin\UsersTable;
+use verifywoo\core\Router;
+use verifywoo\controllers\admin\SelectionTable;
+use verifywoo\controllers\admin\UsersTable;
 
 Router::get('admin-users', 'selection-table', [SelectionTable::class, 'get']);
 Router::post('admin-users', 'selection-table', [SelectionTable::class, 'post']);

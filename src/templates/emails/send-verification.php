@@ -1,7 +1,7 @@
 <?php
 
-use const VerifyWoo\PLUGIN_PREFIX;
-use VerifyWoo\Core\Router;
+use const verifywoo\PLUGIN_PREFIX;
+use verifywoo\core\Router;
 
 defined('ABSPATH') || exit; ?>
 

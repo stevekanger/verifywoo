@@ -1,12 +1,12 @@
 <?php
 
-namespace VerifyWoo\Routes;
+namespace verifywoo\routes;
 
-use VerifyWoo\Core\Router;
-use VerifyWoo\Controllers\App\Error;
-use VerifyWoo\Controllers\App\Send;
-use VerifyWoo\Controllers\App\Success;
-use VerifyWoo\Controllers\App\Verify;
+use verifywoo\core\Router;
+use verifywoo\controllers\app\Error;
+use verifywoo\controllers\app\Send;
+use verifywoo\controllers\app\Success;
+use verifywoo\controllers\app\Verify;
 
 Router::get('email-verification', 'error', [Error::class, 'get']);
 Router::get('email-verification', 'success', [Success::class, 'get']);

@@ -1,8 +1,8 @@
 <?php
 
-namespace VerifyWoo\Inc\Admin;
+namespace verifywoo\inc\admin;
 
-use const VerifyWoo\PLUGIN_NAME;
+use const verifywoo\PLUGIN_NAME;
 use WC_Email_Customer_New_Account;
 
 class Override_WC_Email_Customer_New_Account extends WC_Email_Customer_New_Account {

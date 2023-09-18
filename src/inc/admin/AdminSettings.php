@@ -1,24 +1,25 @@
 <?php
 
-namespace VerifyWoo\Inc\Admin;
+namespace verifywoo\inc\admin;
 
-use const VerifyWoo\PLUGIN_PREFIX;
+use const verifywoo\PLUGIN_PREFIX;
 
-use VerifyWoo\Core\Template;
+use verifywoo\core\Template;
 
 defined('ABSPATH') || exit;
 
 class AdminSettings {
     public static function admin_menu() {
         add_menu_page(__('Verify Woo', 'verifywoo'), __('Verify Woo', 'verifywoo'), 'activate_plugins', PLUGIN_PREFIX, [self::class, 'admin_settings_page_callback'], 'dashicons-shield', 55.5);
-        add_submenu_page(PLUGIN_PREFIX, __('Verify Woo Users', 'verifywoo'), __('Users', 'verifywoo'), 'activate_plugins', PLUGIN_PREFIX . '-users', [self::class, 'admin_users_page_callback']);
+        add_submenu_page(PLUGIN_PREFIX,  __('Verify Woo Settings', 'verifywoo'), __('Settings', 'verifywoo'), "activate_plugins", PLUGIN_PREFIX);
+        add_submenu_page(PLUGIN_PREFIX, __('Verify Woo User Status', 'verifywoo'), __('User Status', 'verifywoo'), 'activate_plugins', PLUGIN_PREFIX . '-users', [self::class, 'admin_users_page_callback']);
     }
 
     public static function add_settings_sections() {
         $settings_sections = self::get_settings();
 
         foreach ($settings_sections as $section) {
-            add_settings_section($section['id'], $section['title'], [self::class, 'settings_section_callback'], 'verifywoo', ['description' => $section['description']]);
+            add_settings_section($section['id'], $section['title'], $section['callback'] ?? [self::class, 'settings_section_callback'], 'verifywoo', ['description' => $section['description']]);
             foreach ($section['settings'] as $setting) {
                 add_settings_field($setting['id'], $setting['title'], [self::class, 'add_settings_field_callback'], PLUGIN_PREFIX, $section['id'], $setting['template_data']);
             }
@@ -30,6 +31,7 @@ class AdminSettings {
 
         foreach ($settings_sections as $section) {
             foreach ($section['settings'] as $setting) {
+                if (isset($setting['skip_register_setting'])) continue;
                 register_setting(PLUGIN_PREFIX, $setting['id'], $setting['register_data']);
             }
         }
@@ -207,6 +209,77 @@ class AdminSettings {
                             'value' => get_option($id),
                         ]
                     ]
+                ]
+            ],
+            'delete_settings' => [
+                'id' => PLUGIN_PREFIX . '_delete_settings',
+                'title' => __('Delete Settings', 'verifywoo'),
+                'description' => __('These settings are used to verify if and how often you would like to delete unverified users. Note: users will only be deleted if tokens are expired.', 'verifywoo'),
+                'settings' => [
+                    [
+                        'id' => ($id = PLUGIN_PREFIX . '_automatically_delete_unverified_users'),
+                        'title' => ($title =  __('Automatically delete unverified users', 'veifywoo')),
+                        'description' => ($description = __('Delete unverified users automatically from database.', 'verifywoo')),
+                        'register_data' => [
+                            'type' => 'boolean',
+                            'default' => false,
+                            'description' => $description,
+                            'show_in_rest' => true
+
+                        ],
+                        'template_data' => [
+                            'id' => $id,
+                            'template' => 'admin/partials/checkbox',
+                            'label_for' => $id,
+                            'name' => $id,
+                            'description' => $description,
+                            'value' => get_option($id),
+                        ]
+                    ],
+                    [
+                        'id' => ($id = PLUGIN_PREFIX . '_automatically_delete_users_frequency'),
+                        'title' => ($title =  __('Automatically delete frequency', 'veifywoo')),
+                        'description' => ($description = __('If delete users automatically is selected this is the frequency to run the script to delete unverified users from database.', 'verifywoo')),
+                        'register_data' => [
+                            'type' => 'string',
+                            'default' => '1 week',
+                            'description' => $description,
+                            'show_in_rest' => true
+
+                        ],
+                        'template_data' => [
+                            'id' => $id,
+                            'template' => 'admin/partials/select',
+                            'label_for' => $id,
+                            'options' => ['1 hour', '1 day', '1 week'],
+                            'name' => $id,
+                            'description' => $description,
+                            'value' => get_option($id),
+                        ]
+                    ],
+                    [
+                        'skip_register_setting' => true,
+                        'id' => ($id = PLUGIN_PREFIX . '_delete_users_utility'),
+                        'title' => ($title =  __('Delete users utility', 'veifywoo')),
+                        'description' => ($description = __('This utility runs once and deletes unverified users from the database.', 'verifywoo')),
+                        'register_data' => [
+                            'type' => 'string',
+                            'default' => '1 week',
+                            'description' => $description,
+                            'show_in_rest' => false
+
+                        ],
+                        'template_data' => [
+                            'id' => $id,
+                            'template' => 'admin/partials/link-button-secondary',
+                            'label_for' => $id,
+                            'name' => $id,
+                            'link_text' => __('Delete Users Utility', 'verifywoo'),
+                            'link_href' => admin_url('admin.php?page=' . PLUGIN_PREFIX . '-users&view=delete_unverified'),
+                            'description' => $description,
+                            'value' => get_option($id),
+                        ]
+                    ],
                 ]
             ]
         ];

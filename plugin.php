@@ -1,6 +1,6 @@
 <?php
 
-namespace VerifyWoo;
+namespace verifywoo;
 
 /**
  * @package verifywoo

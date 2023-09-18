@@ -1,8 +1,8 @@
 <?php
 
-namespace VerifyWoo\Core;
+namespace verifywoo\core;
 
-use const VerifyWoo\PLUGIN_PREFIX;
+use const verifywoo\PLUGIN_PREFIX;
 
 defined('ABSPATH') || exit;
 
@@ -39,6 +39,7 @@ class Users {
                 ]
             ]);
         }
+
         wp_logout();
     }
 
@@ -135,7 +136,7 @@ class Users {
     }
 
     public static function count($where = null) {
-        list($users_table, $tokens_table, $usermeta_table) = DB::tables('users', 'tokens', 'usermeta');
+        list($users_table, $tokens_table) = DB::tables('users', 'tokens');
 
         if (!$where) {
             return DB::get_var("SELECT count(*) from $users_table");
@@ -144,7 +145,6 @@ class Users {
         $statement = "SELECT count(*)
                 FROM $users_table 
                 LEFT JOIN $tokens_table ON $users_table.ID = $tokens_table.user_id
-                LEFT JOIN $usermeta_table ON $users_table.ID = $usermeta_table.user_id AND $usermeta_table.meta_key = 'wp_capabilities'
                 WHERE " . $where;
 
         return DB::get_var($statement);

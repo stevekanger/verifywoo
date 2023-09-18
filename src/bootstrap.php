@@ -1,16 +1,16 @@
 <?php
 
-namespace VerifyWoo;
+namespace verifywoo;
 
-use const VerifyWoo\PLUGIN_ROOT_FILE;
+use const verifywoo\PLUGIN_ROOT_FILE;
 
-use VerifyWoo\Core\Plugin;
-use VerifyWoo\Core\Session;
-use VerifyWoo\Inc\Admin\AdminSettings;
-use VerifyWoo\Inc\Admin\WooSettings;
-use VerifyWoo\Inc\App\InfoChange;
-use VerifyWoo\Inc\App\Login;
-use VerifyWoo\Inc\App\Registration;
+use verifywoo\core\Plugin;
+use verifywoo\core\Session;
+use verifywoo\inc\admin\AdminSettings;
+use verifywoo\inc\admin\WooSettings;
+use verifywoo\inc\app\InfoChange;
+use verifywoo\inc\app\Login;
+use verifywoo\inc\app\Registration;
 
 defined('ABSPATH') || exit;
 

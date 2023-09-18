@@ -1,9 +1,9 @@
 <?php
 
-namespace VerifyWoo\Inc\App;
+namespace verifywoo\inc\app;
 
-use VerifyWoo\Core\Router;
-use VerifyWoo\Core\Users;
+use verifywoo\core\Router;
+use verifywoo\core\Users;
 
 defined('ABSPATH') || exit;
 

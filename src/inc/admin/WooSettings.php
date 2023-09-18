@@ -1,10 +1,10 @@
 <?php
 
-namespace VerifyWoo\Inc\Admin;
+namespace verifywoo\inc\admin;
 
-use const VerifyWoo\PLUGIN_NAME;
-use const VerifyWoo\PLUGIN_PREFIX;
-use const VerifyWoo\PLUGIN_ROOT_DIR;
+use const verifywoo\PLUGIN_NAME;
+use const verifywoo\PLUGIN_PREFIX;
+use const verifywoo\PLUGIN_ROOT_DIR;
 
 defined('ABSPATH') || exit;
 

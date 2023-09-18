@@ -1,11 +1,11 @@
 <?php
 
-namespace VerifyWoo\Controllers\App;
+namespace verifywoo\controllers\app;
 
-use VerifyWoo\Core\DB;
-use VerifyWoo\Core\Mail;
-use VerifyWoo\Core\Template;
-use VerifyWoo\Core\Token;
+use verifywoo\core\DB;
+use verifywoo\core\Mail;
+use verifywoo\core\Template;
+use verifywoo\core\Token;
 
 defined('ABSPATH') || exit;
 
