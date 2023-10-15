@@ -9,7 +9,7 @@ defined('ABSPATH') || exit;
 
 class Login {
     public static function on_login($errors, $login, $pass) {
-        $user = Users::get($login, 'login');
+        $user = Users::get_one($login, 'login');
 
         if (!$user) {
             $errors->add('username-login-error', __('Username does not exist.', 'verifywoo'));

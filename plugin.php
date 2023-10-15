@@ -7,7 +7,7 @@ namespace verifywoo;
  * 
  * Plugin Name: Verify Woo - WooCommerce User Verificaiton
  * Plugin URI: http://stevekanger.com
- * Description: .
+ * Description: Stop spam accounts from registering to your WooCommerce store by verifying their email during registration and automatically remove unverified users.
  * Version: 0.0.1
  * Author: Steve Kanger
  * Author URI: https://stevekanger.com

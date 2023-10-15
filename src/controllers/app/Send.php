@@ -25,7 +25,8 @@ class Send {
         if ($query['verified']) return Template::error(__('That email is already verified.', 'verifywoo'));
 
         $token = Token::create();
-        $inserted = DB::update([
+        $verifywoo_table = DB::table('verifywoo');
+        $inserted = DB::update($verifywoo_table, [
             'token' => $token,
             'expires' => Token::set_exp()
         ], [

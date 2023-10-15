@@ -6,6 +6,7 @@ use const verifywoo\PLUGIN_ROOT_FILE;
 
 use verifywoo\core\Plugin;
 use verifywoo\core\Session;
+use verifywoo\core\Cron;
 use verifywoo\inc\admin\AdminSettings;
 use verifywoo\inc\admin\WooSettings;
 use verifywoo\inc\app\InfoChange;
@@ -19,8 +20,10 @@ register_activation_hook(PLUGIN_ROOT_FILE, [Plugin::class, 'activate']);
 register_deactivation_hook(PLUGIN_ROOT_FILE, [Plugin::class, 'deactivate']);
 
 // Plugin initializations
-add_action('init', [Session::class, 'init']);
 add_action('init', [Plugin::class, 'init']);
+add_action('init', [Session::class, 'init']);
+add_action('init', [Cron::class, 'init']);
+add_action('admin_init', [Plugin::class, 'admin_init']);
 add_filter('display_post_states', [Plugin::class, 'register_pages_post_state'], 10, 2);
 add_filter('body_class', [Plugin::class, 'add_woocommerce_page_class']);
 

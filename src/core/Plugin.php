@@ -2,8 +2,11 @@
 
 namespace verifywoo\core;
 
+use verifywoo\core\Cron;
+
 use const verifywoo\PLUGIN_NAME;
 use const verifywoo\PLUGIN_PREFIX;
+use const verifywoo\PLUGIN_ROOT_FILE;
 
 defined('ABSPATH') || exit;
 
@@ -22,11 +25,30 @@ class Plugin {
 
     public static function deactivate() {
         self::remove_pages();
+        Cron::deactivate();
     }
 
     public static function init() {
         self::register_pages();
         self::add_shortcodes();
+    }
+
+    public static function admin_init() {
+        self::require_woocommerce();
+    }
+
+    public static function require_woocommerce() {
+        if (is_admin() && current_user_can('activate_plugins') &&  !is_plugin_active('woocommerce/woocommerce.php')) {
+            add_action('admin_notices', function () {
+                Template::include('admin/notices/require-woocommerce');
+            });
+
+            deactivate_plugins(plugin_basename(PLUGIN_ROOT_FILE));
+
+            if (isset($_GET['activate'])) {
+                unset($_GET['activate']);
+            }
+        }
     }
 
     public static function register_pages() {

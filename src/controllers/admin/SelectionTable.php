@@ -46,6 +46,8 @@ class SelectionTable {
                 foreach ($users as $user) {
                     Users::unverify($user['ID']);
                 }
+            default:
+                return Template::admin_message(__('Invalid action.', 'verifywoo'));
         }
 
         Router::redirect('url', $redirect);
@@ -56,7 +58,7 @@ class SelectionTable {
         $users = [];
 
         foreach ($ids as $id) {
-            $user = Users::get($id);
+            $user = Users::get_one($id);
             if ($user) $users[] = $user;
         }
 

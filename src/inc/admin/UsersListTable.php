@@ -34,7 +34,7 @@ class UsersListTable extends WP_List_Table {
         $where = $this->get_where();
 
         $total_items = Users::count($where);
-        $items = Users::get_multiple(compact('orderby', 'order', 'limit', 'offset', 'where'));
+        $items = Users::get(compact('orderby', 'order', 'limit', 'offset', 'where'));
 
         $this->items = $items;
 
@@ -49,18 +49,18 @@ class UsersListTable extends WP_List_Table {
         $search = $_REQUEST['s'] ?? null;
         $status = $_REQUEST['status'] ?? null;
         $now = time();
-        list($users_table, $tokens_table) = DB::tables('users', 'tokens');
+        list($users_table, $verifywoo_table) = DB::tables('users', 'verifywoo');
 
         if ($search) {
             return DB::prepare("$users_table.user_email LIKE '%%%s%%' OR $users_table.user_login LIKE '%%%s%%'", [$search, $search]);
         } else if ($status === 'verified') {
-            return "$tokens_table.verified = true";
+            return "$verifywoo_table.verified = true";
         } else if ($status === 'unverified') {
-            return "$tokens_table.verified = false OR $tokens_table.verified is NULL";
+            return "$verifywoo_table.verified = false OR $verifywoo_table.verified is NULL";
         } else if ($status === 'active') {
-            return "$tokens_table.expires > $now";
+            return "$verifywoo_table.expires > $now";
         } else if ($status === 'expired') {
-            return "$tokens_table.expires < $now";
+            return "$verifywoo_table.expires < $now";
         } else {
             return null;
         }
@@ -81,7 +81,7 @@ class UsersListTable extends WP_List_Table {
     }
 
     protected function get_views() {
-        $tokens_table = DB::table();
+        $verifywoo_table = DB::table('verifywoo');
 
         $status = $_REQUEST['status'] ?? null;
         $now = time();
@@ -95,22 +95,22 @@ class UsersListTable extends WP_List_Table {
             [
                 'status' => 'verified',
                 'current' => $status === 'verified',
-                'count' => Users::count("$tokens_table.verified = true"),
+                'count' => Users::count("$verifywoo_table.verified = true"),
             ],
             [
                 'status' => 'unverified',
                 'current' => $status === 'unverified',
-                'count' => Users::count("NOT $tokens_table.verified OR $tokens_table.verified is NULL"),
+                'count' => Users::count("NOT $verifywoo_table.verified OR $verifywoo_table.verified is NULL"),
             ],
             [
                 'status' => 'active',
                 'current' => $status === 'active',
-                'count' =>  Users::count("$tokens_table.expires > $now")
+                'count' =>  Users::count("$verifywoo_table.expires > $now")
             ],
             [
                 'status' => 'expired',
                 'current' => $status === 'expired',
-                'count' => Users::count("$tokens_table.expires < $now")
+                'count' => Users::count("$verifywoo_table.expires < $now")
             ]
         ];
 

@@ -2,15 +2,11 @@
 
 namespace verifywoo\core;
 
-use const verifywoo\PLUGIN_PREFIX;
-
 defined('ABSPATH') || exit;
 
 class DB {
-    public static function table($table = PLUGIN_PREFIX . '_tokens') {
+    public static function table($table) {
         global $wpdb;
-        if ($table === 'tokens') $table = PLUGIN_PREFIX . '_tokens';
-
         return $wpdb->prefix . $table;
     }
 
@@ -25,7 +21,7 @@ class DB {
 
         $charset_collate = $wpdb->get_charset_collate();
 
-        $sql = 'CREATE TABLE ' . self::table() . ' (
+        $sql = 'CREATE TABLE ' . self::table('verifywoo') . ' (
             id bigint(20) UNSIGNED PRIMARY KEY AUTO_INCREMENT,
             user_id bigint(20) UNSIGNED NOT NULL,
             email varchar(255) UNIQUE NOT NULL,
@@ -36,17 +32,17 @@ class DB {
         ) AUTO_INCREMENT=1, ' . $charset_collate . ';';
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        maybe_create_table(self::table(), $sql);
+        maybe_create_table(self::table('verifywoo'), $sql);
     }
 
-    public static function insert($data, $format = null) {
+    public static function insert($table, $data, $format = null) {
         global $wpdb;
-        return $wpdb->insert(self::table(), $data, $format);
+        return $wpdb->insert($table, $data, $format);
     }
 
-    public static function update($data, $where, $format = null, $where_format = null) {
+    public static function update($table, $data, $where, $format = null, $where_format = null) {
         global $wpdb;
-        return $wpdb->update(self::table(), $data, $where, $format, $where_format);
+        return $wpdb->update($table, $data, $where, $format, $where_format);
     }
 
     public static function get_var($query, $params = null) {
@@ -72,9 +68,9 @@ class DB {
         );
     }
 
-    public static function delete($where, $where_format) {
+    public static function delete($table, $where, $where_format) {
         global $wpdb;
-        return $wpdb->delete(self::table(), $where, $where_format);
+        return $wpdb->delete($table, $where, $where_format);
     }
 
     public static function prepare($query, $params = null) {

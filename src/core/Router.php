@@ -7,8 +7,8 @@ defined('ABSPATH') || exit;
 class Router {
     static $routes = [];
 
-    public static function redirect($how, $value, $params = []) {
-        if ($how === 'url') {
+    public static function redirect($by, $value, $params = []) {
+        if ($by === 'url') {
             wp_redirect($value);
             exit;
         }

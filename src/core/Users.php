@@ -9,8 +9,9 @@ defined('ABSPATH') || exit;
 class Users {
     public static function register($user_id, $email) {
         $token = Token::create();
+        $verifywoo_table = DB::table('verirywoo');
 
-        $inserted = DB::insert([
+        $inserted = DB::insert($verifywoo_table, [
             'user_id' => $user_id,
             'token' => $token,
             'expires' => Token::set_exp(),
@@ -51,7 +52,8 @@ class Users {
     }
 
     public static function verify($user_id) {
-        return DB::update([
+        $verifywoo_table = DB::table('verifywoo');
+        return DB::update($verifywoo_table, [
             'token' => null,
             'expires' => null,
             'verified' => true,
@@ -61,7 +63,8 @@ class Users {
     }
 
     public static function unverify($user_id) {
-        return DB::update([
+        $verifywoo_table = DB::table('verifywoo');
+        return DB::update($verifywoo_table, [
             'verified' => false,
         ], [
             'user_id' => $user_id
@@ -72,25 +75,32 @@ class Users {
         return wp_delete_user($user_id);
     }
 
-    public static function required_user_fields() {
-        list($users_table, $tokens_table, $usermeta_table) = DB::tables('users', 'tokens', 'usermeta');
-        return "$users_table.ID, $users_table.user_login, $users_table.user_email, $tokens_table.verified, $tokens_table.expires, $usermeta_table.meta_value as roles";
+    public static function delete_unverified() {
+        $users = self::get_unverified();
+        foreach ($users as $user) {
+            self::delete($user['ID']);
+        }
     }
 
-    public static function get($field, $get_by = 'ID') {
-        list($users_table, $tokens_table, $usermeta_table) = DB::tables('users', 'tokens', 'usermeta');
+    public static function required_user_fields() {
+        list($users_table, $verifywoo_table, $usermeta_table) = DB::tables('users', 'verifywoo', 'usermeta');
+        return "$users_table.ID, $users_table.user_login, $users_table.user_email, $verifywoo_table.verified, $verifywoo_table.expires, $usermeta_table.meta_value as roles";
+    }
+
+    public static function get_one($field, $get_by = 'ID') {
+        list($users_table, $verifywoo_table, $usermeta_table) = DB::tables('users', 'verifywoo', 'usermeta');
 
         if ($get_by === 'ID') {
             $statement = "SELECT " . self::required_user_fields() . "
                 FROM $users_table 
-                LEFT JOIN $tokens_table ON $users_table.ID = $tokens_table.user_id
+                LEFT JOIN $verifywoo_table ON $users_table.ID = $verifywoo_table.user_id
                 LEFT JOIN $usermeta_table ON $users_table.ID = $usermeta_table.user_id AND $usermeta_table.meta_key = 'wp_capabilities'
                 WHERE $users_table.ID = %d";
             $user = DB::get_row($statement, [$field]);
         } else {
             $statement = "SELECT " . self::required_user_fields() . "
                 FROM $users_table 
-                LEFT JOIN $tokens_table ON $users_table.ID = $tokens_table.user_id
+                LEFT JOIN $verifywoo_table ON $users_table.ID = $verifywoo_table.user_id
                 LEFT JOIN $usermeta_table ON $users_table.ID = $usermeta_table.user_id AND $usermeta_table.meta_key = 'wp_capabilities'
                 WHERE $users_table.user_login = %s OR $users_table.user_email = %s";
             $user = DB::get_row($statement, [$field, $field]);
@@ -101,29 +111,29 @@ class Users {
         return $user;
     }
 
-    public static function get_multiple($args) {
-        list($users_table, $tokens_table, $usermeta_table) = DB::tables('users', 'tokens', 'usermeta');
+    public static function get($args) {
+        list($users_table, $verifywoo_table, $usermeta_table) = DB::tables('users', 'verifywoo', 'usermeta');
 
         if (isset($args['where'])) {
             $statement = "SELECT " . self::required_user_fields() . " 
                 FROM $users_table
-                LEFT JOIN $tokens_table ON $users_table.ID = $tokens_table.user_id
+                LEFT JOIN $verifywoo_table ON $users_table.ID = $verifywoo_table.user_id
                 LEFT JOIN $usermeta_table ON $users_table.ID = $usermeta_table.user_id AND $usermeta_table.meta_key = 'wp_capabilities'
                 WHERE " . $args['where'] . " 
                 ORDER BY %1s %1s limit %d offset %d";
             $users = DB::get_results(
                 $statement,
-                [$args['orderby'] ?? null, $args['order'] ?? null, $args['limit'] ?? null, $args['offset'] ?? null],
+                [$args['orderby'] ?? 'ID', $args['order'] ?? "ASC", $args['limit'] ?? '25', $args['offset'] ?? '0'],
             );
         } else {
             $statement = "SELECT " . self::required_user_fields() . " 
                 FROM $users_table
-                LEFT JOIN $tokens_table ON $users_table.ID = $tokens_table.user_id
+                LEFT JOIN $verifywoo_table ON $users_table.ID = $verifywoo_table.user_id
                 LEFT JOIN $usermeta_table ON $users_table.ID = $usermeta_table.user_id AND $usermeta_table.meta_key = 'wp_capabilities'
                 ORDER BY %1s %1s limit %d offset %d";
             $users = DB::get_results(
                 $statement,
-                [$args['orderby'] ?? null, $args['order'] ?? null, $args['limit'] ?? null, $args['offset'] ?? null]
+                [$args['orderby'] ?? "ID", $args['order'] ?? "ASC", $args['limit'] ?? '25', $args['offset'] ?? '0']
             );
         }
 
@@ -135,8 +145,18 @@ class Users {
         return $users;
     }
 
+    public static function get_unverified() {
+        list($verifywoo_table, $usermeta_table) = DB::tables('verifywoo', 'usermeta');
+        $count = self::count();
+        $users = self::get([
+            'limit' => $count,
+            'where' => "($verifywoo_table.verified = false OR $verifywoo_table.verified IS NULL) AND ($usermeta_table.meta_value NOT LIKE '%administrator%')"
+        ]);
+        return $users;
+    }
+
     public static function count($where = null) {
-        list($users_table, $tokens_table) = DB::tables('users', 'tokens');
+        list($users_table, $verifywoo_table) = DB::tables('users', 'verifywoo');
 
         if (!$where) {
             return DB::get_var("SELECT count(*) from $users_table");
@@ -144,7 +164,7 @@ class Users {
 
         $statement = "SELECT count(*)
                 FROM $users_table 
-                LEFT JOIN $tokens_table ON $users_table.ID = $tokens_table.user_id
+                LEFT JOIN $verifywoo_table ON $users_table.ID = $verifywoo_table.user_id
                 WHERE " . $where;
 
         return DB::get_var($statement);

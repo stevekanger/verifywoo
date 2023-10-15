@@ -5,6 +5,7 @@ namespace verifywoo\inc\admin;
 use const verifywoo\PLUGIN_PREFIX;
 
 use verifywoo\core\Template;
+use verifywoo\core\Cron;
 
 defined('ABSPATH') || exit;
 
@@ -19,7 +20,7 @@ class AdminSettings {
         $settings_sections = self::get_settings();
 
         foreach ($settings_sections as $section) {
-            add_settings_section($section['id'], $section['title'], $section['callback'] ?? [self::class, 'settings_section_callback'], 'verifywoo', ['description' => $section['description']]);
+            add_settings_section($section['id'], $section['title'], $section['callback'] ?? [self::class, 'settings_section_callback'], 'verifywoo', $section['args']);
             foreach ($section['settings'] as $setting) {
                 add_settings_field($setting['id'], $setting['title'], [self::class, 'add_settings_field_callback'], PLUGIN_PREFIX, $section['id'], $setting['template_data']);
             }
@@ -28,10 +29,13 @@ class AdminSettings {
 
     public static function register_settings() {
         $settings_sections = self::get_settings();
-
         foreach ($settings_sections as $section) {
             foreach ($section['settings'] as $setting) {
                 if (isset($setting['skip_register_setting'])) continue;
+                if (isset($setting['on_change'])) {
+                    add_filter('update_option_' . $setting['id'], ...$setting['on_change']);
+                }
+
                 register_setting(PLUGIN_PREFIX, $setting['id'], $setting['register_data']);
             }
         }
@@ -49,6 +53,10 @@ class AdminSettings {
         echo '<p>' . $data['description'] ?? null . '</p>';
     }
 
+    public static function delete_settings_section_callback($data) {
+        echo '<p style="font-weight: bold; color: #ff0000">Danger: users will be permenantly deleted. This cannot be undone without a backup.</p><p>' . $data['description'] ?? null . '</p>';
+    }
+
     public static function add_settings_field_callback($data) {
         Template::include($data['template'], $data);
     }
@@ -58,7 +66,9 @@ class AdminSettings {
             'registration_settings' => [
                 'id' => PLUGIN_PREFIX . '_registration_settings',
                 'title' => __('Registration Settings', 'verifywoo'),
-                'description' => __('These settings are tied to the registration process. They are called when a new user is registered.', 'verifywoo'),
+                'args' => [
+                    'description' => __('These settings are tied to the registration process. They are called when a new user is registered.', 'verifywoo'),
+                ],
                 'settings' => [
                     [
                         'id' => ($id = PLUGIN_PREFIX . '_min_password_strength'),
@@ -127,7 +137,9 @@ class AdminSettings {
             'email_settings' => [
                 'id' => PLUGIN_PREFIX . '_email_settings',
                 'title' => __('Email Settings', 'verifywoo'),
-                'description' => __('General email settings. These settings are used to form the email content. The default woocommerce header and footer are used for email templates.', 'verifywoo'),
+                'args' => [
+                    'description' => __('General email settings. These settings are used to form the email content. The default woocommerce header and footer are used for email templates.', 'verifywoo'),
+                ],
                 'settings' => [
                     [
                         'id' => ($id = PLUGIN_PREFIX . '_use_plaintext_emails'),
@@ -214,12 +226,16 @@ class AdminSettings {
             'delete_settings' => [
                 'id' => PLUGIN_PREFIX . '_delete_settings',
                 'title' => __('Delete Settings', 'verifywoo'),
-                'description' => __('These settings are used to verify if and how often you would like to delete unverified users. Note: users will only be deleted if tokens are expired.', 'verifywoo'),
+                'callback' => [self::class, 'delete_settings_section_callback'],
+                'args' => [
+                    'description' => __('These settings are used to verify if and how often you would like to delete unverified users. Users will only be deleted if tokens are expired.', 'verifywoo'),
+                ],
                 'settings' => [
                     [
                         'id' => ($id = PLUGIN_PREFIX . '_automatically_delete_unverified_users'),
                         'title' => ($title =  __('Automatically delete unverified users', 'veifywoo')),
                         'description' => ($description = __('Delete unverified users automatically from database.', 'verifywoo')),
+                        'on_change' => [[Cron::class, 'update_option_automatically_delete_unverified_users'], 10, 3],
                         'register_data' => [
                             'type' => 'boolean',
                             'default' => false,
@@ -237,9 +253,10 @@ class AdminSettings {
                         ]
                     ],
                     [
-                        'id' => ($id = PLUGIN_PREFIX . '_automatically_delete_users_frequency'),
+                        'id' => ($id = PLUGIN_PREFIX . '_automatically_delete_unverified_users_frequency'),
                         'title' => ($title =  __('Automatically delete frequency', 'veifywoo')),
                         'description' => ($description = __('If delete users automatically is selected this is the frequency to run the script to delete unverified users from database.', 'verifywoo')),
+                        'on_change' => [[Cron::class, 'update_option_automatically_delete_unverified_users_frequency'], 10, 3],
                         'register_data' => [
                             'type' => 'string',
                             'default' => '1 week',
@@ -251,7 +268,7 @@ class AdminSettings {
                             'id' => $id,
                             'template' => 'admin/partials/select',
                             'label_for' => $id,
-                            'options' => ['1 hour', '1 day', '1 week'],
+                            'options' => ['weekly', 'daily', 'hourly', 'minute'],
                             'name' => $id,
                             'description' => $description,
                             'value' => get_option($id),
@@ -264,7 +281,7 @@ class AdminSettings {
                         'description' => ($description = __('This utility runs once and deletes unverified users from the database.', 'verifywoo')),
                         'register_data' => [
                             'type' => 'string',
-                            'default' => '1 week',
+                            'default' => 'weekly',
                             'description' => $description,
                             'show_in_rest' => false
 
@@ -275,7 +292,7 @@ class AdminSettings {
                             'label_for' => $id,
                             'name' => $id,
                             'link_text' => __('Delete Users Utility', 'verifywoo'),
-                            'link_href' => admin_url('admin.php?page=' . PLUGIN_PREFIX . '-users&view=delete_unverified'),
+                            'link_href' => admin_url('admin.php?page=' . PLUGIN_PREFIX . '-users&view=delete-utility'),
                             'description' => $description,
                             'value' => get_option($id),
                         ]

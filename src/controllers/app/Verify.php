@@ -29,7 +29,7 @@ class Verify {
         $updated = Users::verify($data['user_id']);
         if (!$updated) return Template::error(__('There was an issue verifying your token.', 'verifywoo'));
 
-        DB::query('DELETE from ' . DB::table() . ' where user_id = %d AND id <> %d', [$data['user_id'], $data['id']]);
+        DB::query('DELETE from ' . DB::table('verifywoo') . ' where user_id = %d AND id <> %d', [$data['user_id'], $data['id']]);
 
         Template::success(__('You have successfully verified your email address. You can now proceed to the account page.', 'verifywoo'), true);
     }
