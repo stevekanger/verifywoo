@@ -82,6 +82,32 @@ class Users {
         }
     }
 
+    public static function get_roles($just_keys = false) {
+        global $wp_roles;
+        $roles = $wp_roles->roles;
+
+        if ($just_keys) {
+            return array_keys($roles);
+        }
+
+        return $roles;
+    }
+
+    public static function get_editable_roles($just_keys = true) {
+        global $wp_roles;
+
+        $all_roles = $wp_roles->roles;
+        Utils::debug(array_keys($all_roles));
+        $editable_roles = apply_filters('editable_roles', $all_roles);
+        unset($editable_roles['administrator']);
+
+        if ($just_keys) {
+            return array_keys($editable_roles);
+        }
+
+        return $editable_roles;
+    }
+
     public static function required_user_fields() {
         list($users_table, $verifywoo_table, $usermeta_table) = DB::tables('users', 'verifywoo', 'usermeta');
         return "$users_table.ID, $users_table.user_login, $users_table.user_email, $verifywoo_table.verified, $verifywoo_table.expires, $usermeta_table.meta_value as roles";
@@ -145,14 +171,39 @@ class Users {
         return $users;
     }
 
-    public static function get_unverified() {
-        list($verifywoo_table, $usermeta_table) = DB::tables('verifywoo', 'usermeta');
+    public static function get_unverified($exclude_user_specified_roles = true) {
+        $verifywoo_table = DB::table('verifywoo');
+
         $count = self::count();
         $users = self::get([
             'limit' => $count,
-            'where' => "($verifywoo_table.verified = false OR $verifywoo_table.verified IS NULL) AND ($usermeta_table.meta_value NOT LIKE '%administrator%')"
+            'where' => "($verifywoo_table.verified = false OR $verifywoo_table.verified IS NULL)"
         ]);
+
+        if ($exclude_user_specified_roles) return self::remove_user_specified_roles($users);
+
         return $users;
+    }
+
+    private static function remove_user_specified_roles($users) {
+        $excluded_roles = get_option(PLUGIN_PREFIX . '_delete_users_exclude_roles') ?? [];
+        array_push($excluded_roles, "administrator");
+
+        $filter_roles = function ($user) use ($excluded_roles) {
+            $has_role = false;
+
+            for ($i = 0; $i < count($excluded_roles); $i++) {
+                if ($user['roles'][$excluded_roles[$i]] ?? null) {
+                    $has_role = true;
+                    Utils::debug($user);
+                    break;
+                }
+            }
+
+            if (!$has_role) return $user;
+        };
+
+        return array_filter($users, $filter_roles);
     }
 
     public static function count($where = null) {

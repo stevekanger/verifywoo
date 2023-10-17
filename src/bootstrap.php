@@ -48,3 +48,5 @@ add_filter('woocommerce_save_account_details_errors', [InfoChange::class, 'on_em
 
 // Handle Login Events
 add_filter('woocommerce_process_login_errors', [Login::class, 'on_login'], 10, 3);
+
+include_once('utils/dummy_data.php');

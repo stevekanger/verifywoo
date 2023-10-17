@@ -6,6 +6,7 @@ use const verifywoo\PLUGIN_PREFIX;
 
 use verifywoo\core\Template;
 use verifywoo\core\Cron;
+use verifywoo\core\Users;
 
 defined('ABSPATH') || exit;
 
@@ -59,6 +60,22 @@ class AdminSettings {
 
     public static function add_settings_field_callback($data) {
         Template::include($data['template'], $data);
+    }
+
+    private static function get_deletable_roles() {
+        $roles = Users::get_roles(true);
+        unset($roles['administrator']);
+
+        return $roles;
+    }
+
+    private static function get_default_deletable_roles() {
+        $roles = self::get_deletable_roles();
+        $defaults = array_filter($roles, function ($item) {
+            return $item !== 'customer';
+        });
+
+        return $defaults;
     }
 
     private static function get_settings() {
@@ -269,6 +286,33 @@ class AdminSettings {
                             'template' => 'admin/partials/select',
                             'label_for' => $id,
                             'options' => ['weekly', 'daily', 'hourly', 'minute'],
+                            'name' => $id,
+                            'description' => $description,
+                            'value' => get_option($id),
+                        ]
+                    ],
+                    [
+                        'id' => ($id = PLUGIN_PREFIX . '_delete_users_exclude_roles'),
+                        'title' => ($title =  __('Exclude roles when deleting unverified users.', 'veifywoo')),
+                        'description' => ($description = __('User roles to exclude when deleting unverified users.', 'verifywoo')),
+                        'register_data' => [
+                            'type' => 'array',
+                            'default' => self::get_default_deletable_roles(),
+                            'description' => $description,
+                            'show_in_rest' => [
+                                'schema' => [
+                                    'type' => 'array',
+                                    'items' => [
+                                        'type' => 'string'
+                                    ]
+                                ]
+                            ]
+
+                        ],
+                        'template_data' => [
+                            'id' => $id,
+                            'template' => 'admin/partials/checklist',
+                            'options' => self::get_deletable_roles(),
                             'name' => $id,
                             'description' => $description,
                             'value' => get_option($id),
