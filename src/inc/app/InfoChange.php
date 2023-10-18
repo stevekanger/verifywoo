@@ -34,7 +34,7 @@ class InfoChange {
 
         wc_clear_notices();
 
-        $exists = DB::get_row('SELECT email from ' . DB::table('verifywoo') . ' where email = %s', $email);
+        $exists = DB::get_row('SELECT email from ' . DB::table(PLUGIN_PREFIX) . ' where email = %s', $email);
 
         if ($exists) Router::redirect('permalink', 'email-verification', [
             'view' => 'error',
@@ -43,7 +43,7 @@ class InfoChange {
 
         $token = Token::create();
 
-        $verifywoo_table = DB::table('verifywoo');
+        $verifywoo_table = DB::table(PLUGIN_PREFIX);
         $inserted = DB::insert($verifywoo_table, [
             'user_id' => $user_id,
             'token' => $token,

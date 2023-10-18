@@ -11,7 +11,9 @@ class DeleteUtility {
     public static function get() {
         $users = Users::get_unverified();
 
-        if (!$users) return Template::admin_message(__('No unverified users found.', 'verifywoo'));
+        if (!$users) {
+            return Template::admin_message(__('No unverified users found.', 'verifywoo'));
+        }
 
         Template::include('admin/views/selection-table', [
             'users' => $users,

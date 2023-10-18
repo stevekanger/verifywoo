@@ -8,6 +8,8 @@ use verifywoo\core\Router;
 use verifywoo\core\Token;
 use WP_List_Table;
 
+use const verifywoo\PLUGIN_PREFIX;
+
 class UsersListTable extends WP_List_Table {
     public function __construct() {
         parent::__construct(
@@ -81,7 +83,7 @@ class UsersListTable extends WP_List_Table {
     }
 
     protected function get_views() {
-        $verifywoo_table = DB::table('verifywoo');
+        $verifywoo_table = DB::table(PLUGIN_PREFIX);
 
         $status = $_REQUEST['status'] ?? null;
         $now = time();

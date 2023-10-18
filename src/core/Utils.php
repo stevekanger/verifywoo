@@ -18,6 +18,7 @@ class Utils {
                     error_log($item ?? '');
                 }
             }
+            error_log('-------------');
         }
     }
 }

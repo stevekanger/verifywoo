@@ -1,5 +1,7 @@
 <?php
 
+use const verifywoo\PLUGIN_PREFIX;
+
 defined('ABSPATH') || exit; ?>
 
 <?php if ($data['action']) : ?>
@@ -8,7 +10,7 @@ defined('ABSPATH') || exit; ?>
     <p>You have selected the following users to <?php echo $data['action'] ?>.</p>
 
     <form method="post">
-        <?php wp_nonce_field() ?>
+        <?php wp_nonce_field(PLUGIN_PREFIX . '_selection_table') ?>
         <input type="hidden" name="users" value="<?php echo urlencode(serialize($data['users'])) ?>">
         <input type="hidden" name="page" value="<?php echo $_REQUEST['page'] ?>">
         <input type="hidden" name="action" value="<?php echo $data['action'] ?>">

@@ -9,7 +9,7 @@ defined('ABSPATH') || exit;
 class Users {
     public static function register($user_id, $email) {
         $token = Token::create();
-        $verifywoo_table = DB::table('verirywoo');
+        $verifywoo_table = DB::table(PLUGIN_PREFIX);
 
         $inserted = DB::insert($verifywoo_table, [
             'user_id' => $user_id,
@@ -52,7 +52,7 @@ class Users {
     }
 
     public static function verify($user_id) {
-        $verifywoo_table = DB::table('verifywoo');
+        $verifywoo_table = DB::table(PLUGIN_PREFIX);
         return DB::update($verifywoo_table, [
             'token' => null,
             'expires' => null,
@@ -63,7 +63,7 @@ class Users {
     }
 
     public static function unverify($user_id) {
-        $verifywoo_table = DB::table('verifywoo');
+        $verifywoo_table = DB::table(PLUGIN_PREFIX);
         return DB::update($verifywoo_table, [
             'verified' => false,
         ], [
@@ -72,6 +72,7 @@ class Users {
     }
 
     public static function delete($user_id) {
+        require_once(ABSPATH . 'wp-admin/includes/user.php');
         return wp_delete_user($user_id);
     }
 
@@ -97,7 +98,6 @@ class Users {
         global $wp_roles;
 
         $all_roles = $wp_roles->roles;
-        Utils::debug(array_keys($all_roles));
         $editable_roles = apply_filters('editable_roles', $all_roles);
         unset($editable_roles['administrator']);
 
@@ -171,8 +171,8 @@ class Users {
         return $users;
     }
 
-    public static function get_unverified($exclude_user_specified_roles = true) {
-        $verifywoo_table = DB::table('verifywoo');
+    public static function get_unverified($exclude_specified_roles = true) {
+        $verifywoo_table = DB::table(PLUGIN_PREFIX);
 
         $count = self::count();
         $users = self::get([
@@ -180,12 +180,12 @@ class Users {
             'where' => "($verifywoo_table.verified = false OR $verifywoo_table.verified IS NULL)"
         ]);
 
-        if ($exclude_user_specified_roles) return self::remove_user_specified_roles($users);
+        if ($exclude_specified_roles) return self::filter_excluded_roles($users);
 
         return $users;
     }
 
-    private static function remove_user_specified_roles($users) {
+    private static function filter_excluded_roles($users) {
         $excluded_roles = get_option(PLUGIN_PREFIX . '_delete_users_exclude_roles') ?? [];
         array_push($excluded_roles, "administrator");
 
@@ -195,7 +195,6 @@ class Users {
             for ($i = 0; $i < count($excluded_roles); $i++) {
                 if ($user['roles'][$excluded_roles[$i]] ?? null) {
                     $has_role = true;
-                    Utils::debug($user);
                     break;
                 }
             }

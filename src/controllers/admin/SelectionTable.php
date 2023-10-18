@@ -12,7 +12,9 @@ class SelectionTable {
     public static function get() {
         $users = self::get_users();
 
-        if (!$users) return Template::admin_message(__('No users found.', 'verifywoo'));
+        if (!$users) {
+            return Template::admin_message(__('No users found.', 'verifywoo'));
+        }
 
         Template::include('admin/views/selection-table', [
             'users' => $users,
@@ -24,7 +26,9 @@ class SelectionTable {
         $users = unserialize(urldecode($_REQUEST['users'] ?? []));
         $redirect = urldecode($_REQUEST['redirect']) ?? admin_url('admin.php?page=' . ($_REQUEST['page'] ?? null));
 
-        if (!$users) return Template::admin_message(__('No users found.', 'verifywoo'));
+        if (!$users) {
+            return Template::admin_message(__('No users found.', 'verifywoo'));
+        }
 
         $action = $_REQUEST['action'] ?? null;
 
