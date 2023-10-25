@@ -38,6 +38,6 @@ class Verify {
 
         DB::query('DELETE from ' . DB::table(PLUGIN_PREFIX) . ' where user_id = %d AND id <> %d', [$data['user_id'], $data['id']]);
 
-        Template::success(__('You have successfully verified your email address. You can now proceed to the account page.', 'verifywoo'), true);
+        Template::success(__('You have successfully verified your email address. You can now login.', 'verifywoo'), true);
     }
 }

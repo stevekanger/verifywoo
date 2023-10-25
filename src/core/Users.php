@@ -27,7 +27,8 @@ class Users {
             ]);
         }
 
-        $mailContent = Template::get_clean('emails/send-verification', [
+        $use_plaintext = get_option(PLUGIN_PREFIX . '_use_plaintext_emails');
+        $mailContent = Template::get_clean($use_plaintext ? 'emails/plain/send-verification' : 'emails/send-verification', [
             'token' => $token
         ]);
 
@@ -175,9 +176,11 @@ class Users {
         $verifywoo_table = DB::table(PLUGIN_PREFIX);
 
         $count = self::count();
+        $now = time();
+
         $users = self::get([
             'limit' => $count,
-            'where' => "($verifywoo_table.verified = false OR $verifywoo_table.verified IS NULL)"
+            'where' => "($verifywoo_table.verified = false OR $verifywoo_table.verified IS NULL) AND ($verifywoo_table.expires < $now)"
         ]);
 
         if ($exclude_specified_roles) return self::filter_excluded_roles($users);

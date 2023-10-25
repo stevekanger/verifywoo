@@ -224,7 +224,7 @@ class AdminSettings {
                         'description' => ($description = __('The content of the verification email that will be displayed before the verifiction link.', 'verifywoo')),
                         'register_data' => [
                             'type' => 'string',
-                            'default' => __('Please verify your email address by clicking the link below.', 'verifywoo'),
+                            'default' => __('Please verify your email at the link below.', 'verifywoo'),
                             'description' => $description,
                             'show_in_rest' => true
                         ],

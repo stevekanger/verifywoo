@@ -91,33 +91,38 @@ class UsersListTable extends WP_List_Table {
         $links = [
             [
                 'status' => 'all',
+                'text' => 'All',
                 'current' => !$status || ($status === 'all'),
                 'count' => Users::count(),
             ],
             [
                 'status' => 'verified',
+                'text' => 'Verified',
                 'current' => $status === 'verified',
                 'count' => Users::count("$verifywoo_table.verified = true"),
             ],
             [
                 'status' => 'unverified',
+                'text' => 'Unverified',
                 'current' => $status === 'unverified',
                 'count' => Users::count("NOT $verifywoo_table.verified OR $verifywoo_table.verified is NULL"),
             ],
             [
                 'status' => 'active',
+                'text' => 'Active Token',
                 'current' => $status === 'active',
                 'count' =>  Users::count("$verifywoo_table.expires > $now")
             ],
             [
                 'status' => 'expired',
+                'text' => 'Expired Token',
                 'current' => $status === 'expired',
                 'count' => Users::count("$verifywoo_table.expires < $now")
             ]
         ];
 
         $status_links = array_map(function ($link) {
-            return '<a class="' . ($link['current'] ? 'current' : '') . '" href="?page=' . $_REQUEST['page'] . '&status=' . $link['status'] . '">' . ucfirst($link['status']) . ' (' . $link['count'] . ')</a>';
+            return '<a class="' . ($link['current'] ? 'current' : '') . '" href="?page=' . $_REQUEST['page'] . '&status=' . $link['status'] . '">' . $link['text'] . ' (' . $link['count'] . ')</a>';
         }, $links);
 
         return $status_links;

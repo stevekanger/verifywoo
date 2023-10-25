@@ -38,7 +38,7 @@ add_action('admin_init', [AdminSettings::class, 'add_settings_sections']);
 add_action('init', [AdminSettings::class, 'register_settings']);
 
 // Handle Registration Events
-/* add_action('user_register', [Registration::class, 'on_registration'], 10, 2); */
+add_action('user_register', [Registration::class, 'on_registration'], 10, 2);
 add_filter('woocommerce_registration_auth_new_customer', [Registration::class, 'woocommerce_registration_auth_new_customer']);
 add_action('woocommerce_register_form', [Registration::class, 'include_retype_password_input']);
 add_filter('woocommerce_registration_errors', [Registration::class, 'on_registration_password_validation'], 10, 3);
@@ -48,5 +48,3 @@ add_filter('woocommerce_save_account_details_errors', [InfoChange::class, 'on_em
 
 // Handle Login Events
 add_filter('woocommerce_process_login_errors', [Login::class, 'on_login'], 10, 3);
-
-include_once('utils/dummy_data.php');
