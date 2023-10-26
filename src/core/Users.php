@@ -7,6 +7,16 @@ use const verifywoo\PLUGIN_PREFIX;
 defined('ABSPATH') || exit;
 
 class Users {
+    public static function check_email($email) {
+        $query = DB::get_var('SELECT verified from ' . DB::table(PLUGIN_PREFIX) . ' where email = %s', [$email]);
+        return $query['verified'] ?? 0;
+    }
+
+    public static function check_id($user_id) {
+        $query = DB::get_var('SELECT verified from ' . DB::table(PLUGIN_PREFIX) . ' where user_id = %d', [$user_id]);
+        return $query['verified'] ?? 0;
+    }
+
     public static function register($user_id, $email) {
         $token = Token::create();
         $verifywoo_table = DB::table(PLUGIN_PREFIX);
