@@ -6,6 +6,7 @@ use verifywoo\core\DB;
 use verifywoo\core\Users;
 use verifywoo\core\Router;
 use verifywoo\core\Token;
+use verifywoo\core\Utils;
 use WP_List_Table;
 
 use const verifywoo\PLUGIN_PREFIX;
@@ -157,7 +158,8 @@ class UsersListTable extends WP_List_Table {
         }
 
         return sprintf(
-            '%s %s',
+            '<a href="' . admin_url('user-edit.php') . '?user_id=%d">%s</a> %s',
+            $user['ID'],
             $user['user_login'],
             $this->row_actions($actions)
         );
