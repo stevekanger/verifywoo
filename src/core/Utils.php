@@ -9,7 +9,7 @@ class Utils {
         $backtrace = debug_backtrace();
         $caller = array_shift($backtrace);
         if (true === \WP_DEBUG) {
-            $line = '--- DEBUG --- in file: ' . $caller['file'] . ' On line: ' . strval($caller['line']);
+            $line = '--- START DEBUG --- in file: ' . $caller['file'] . ' On line: ' . strval($caller['line']);
             error_log($line);
             foreach ($items as $item) {
                 if (is_array($item) || is_object($item)) {
@@ -18,7 +18,7 @@ class Utils {
                     error_log($item ?? '');
                 }
             }
-            error_log('-------------');
+            error_log('--- END DEBUG ---');
         }
     }
 }

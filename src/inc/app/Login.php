@@ -8,7 +8,7 @@ use verifywoo\core\Users;
 defined('ABSPATH') || exit;
 
 class Login {
-    public static function on_login($errors, $login, $pass) {
+    public static function woocommerce_process_login_errors($errors, $login, $pass) {
         $user = Users::get_one($login, 'login');
 
         if (!$user) {

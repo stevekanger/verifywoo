@@ -13,23 +13,11 @@ class Token {
         return $query ? self::create() : $token;
     }
 
-    static function verify($token) {
-        if (!$token) return null;
-
-        $data = DB::get_row('SELECT * from ' . DB::table(PLUGIN_PREFIX) . ' where token = %s', $token);
-        if (!$data) return null;
-
-        $expires = $data['expires'] ?? null;
-        if (!$expires || !self::verify_exp($expires)) return null;
-
-        return $data;
-    }
-
     static function set_exp() {
         return strtotime('+' . get_option(PLUGIN_PREFIX . '_verification_expiration_length'), time());
     }
 
-    static function verify_exp($expires) {
-        return time() < $expires;
+    static function verify($token_exp) {
+        return time() < $token_exp;
     }
 }

@@ -2,6 +2,8 @@
 
 namespace verifywoo\core;
 
+use const verifywoo\PLUGIN_PREFIX;
+
 defined('ABSPATH') || exit;
 
 class DB {
@@ -21,18 +23,19 @@ class DB {
 
         $charset_collate = $wpdb->get_charset_collate();
 
-        $sql = 'CREATE TABLE ' . self::table('verifywoo') . ' (
+        $sql = 'CREATE TABLE ' . self::table(PLUGIN_PREFIX) . ' (
             id bigint(20) UNSIGNED PRIMARY KEY AUTO_INCREMENT,
             user_id bigint(20) UNSIGNED NOT NULL,
             email varchar(255) UNIQUE NOT NULL,
+            email_change varchar(255) DEFAULT NULL,
             token varchar(100) UNIQUE DEFAULT NULL,
-            expires bigint(20) DEFAULT NULL,
+            token_exp bigint(20) DEFAULT NULL,
             verified boolean NOT NULL DEFAULT false,
             FOREIGN KEY (user_id) REFERENCES ' . $wpdb->prefix . 'users (ID) ON DELETE CASCADE 
         ) AUTO_INCREMENT=1, ' . $charset_collate . ';';
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        maybe_create_table(self::table('verifywoo'), $sql);
+        maybe_create_table(self::table(PLUGIN_PREFIX), $sql);
     }
 
     public static function insert($table, $data, $format = null) {

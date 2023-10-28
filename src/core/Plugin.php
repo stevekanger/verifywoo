@@ -25,7 +25,7 @@ class Plugin {
 
     public static function deactivate() {
         self::remove_pages();
-        Cron::deactivate();
+        Cron::plugin_deactivate();
     }
 
     public static function init() {

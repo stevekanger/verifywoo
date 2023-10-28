@@ -24,9 +24,9 @@ class Users {
         $inserted = DB::insert($verifywoo_table, [
             'user_id' => $user_id,
             'token' => $token,
-            'expires' => Token::set_exp(),
-            'email' => $email
-        ], ['%d', '%s', '%d', '%s']);
+            'token_exp' => Token::set_exp(),
+            'email' => $email,
+        ], ['%d', '%s', '%d', '%s', '%s']);
 
         if (!$inserted) {
             Session::set([
@@ -37,12 +37,7 @@ class Users {
             ]);
         }
 
-        $use_plaintext = get_option(PLUGIN_PREFIX . '_use_plaintext_emails');
-        $mailContent = Template::get_clean($use_plaintext ? 'emails/plain/send-verification' : 'emails/send-verification', [
-            'token' => $token
-        ]);
-
-        $mail = Mail::send($email, get_option(PLUGIN_PREFIX . '_verification_email_subject'), $mailContent);
+        $mail = Mail::send_token($email, $token);
         if (!$mail) {
             Session::set([
                 'registration_redirect' => [
@@ -64,9 +59,10 @@ class Users {
 
     public static function verify($user_id) {
         $verifywoo_table = DB::table(PLUGIN_PREFIX);
+
         return DB::update($verifywoo_table, [
             'token' => null,
-            'expires' => null,
+            'token_exp' => null,
             'verified' => true,
         ], [
             'user_id' => $user_id
@@ -121,7 +117,7 @@ class Users {
 
     public static function required_user_fields() {
         list($users_table, $verifywoo_table, $usermeta_table) = DB::tables('users', 'verifywoo', 'usermeta');
-        return "$users_table.ID, $users_table.user_login, $users_table.user_email, $verifywoo_table.verified, $verifywoo_table.expires, $usermeta_table.meta_value as roles";
+        return "$users_table.ID, $users_table.user_login, $users_table.user_email, $verifywoo_table.verified, $verifywoo_table.token_exp, $usermeta_table.meta_value as roles";
     }
 
     public static function get_one($field, $get_by = 'ID') {
@@ -190,7 +186,7 @@ class Users {
 
         $users = self::get([
             'limit' => $count,
-            'where' => "($verifywoo_table.verified = false OR $verifywoo_table.verified IS NULL) AND ($verifywoo_table.expires < $now)"
+            'where' => "($verifywoo_table.verified = false OR $verifywoo_table.verified IS NULL) AND ($verifywoo_table.token_exp < $now)"
         ]);
 
         if ($exclude_specified_roles) return self::filter_excluded_roles($users);

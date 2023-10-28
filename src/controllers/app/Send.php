@@ -41,7 +41,7 @@ class Send {
         $verifywoo_table = DB::table(PLUGIN_PREFIX);
         $inserted = DB::update($verifywoo_table, [
             'token' => $token,
-            'expires' => Token::set_exp()
+            'token_exp' => Token::set_exp()
         ], [
             'id' => $query['id']
         ]);

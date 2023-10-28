@@ -12,7 +12,7 @@ use const verifywoo\PLUGIN_PREFIX;
 defined('ABSPATH') || exit;
 
 class Registration {
-    public static function on_registration($user_id, $user_data,) {
+    public static function user_register($user_id, $user_data,) {
         $email = $user_data['user_email'];
         Users::register($user_id, $email);
     }
@@ -21,7 +21,7 @@ class Registration {
         Router::redirect('permalink', 'email-verification', Session::get_item('registration_redirect'));
     }
 
-    public static function on_registration_password_validation($errors, $username, $email) {
+    public static function woocommerce_registration_errors($errors, $username, $email) {
         $include_retype_password = get_option(PLUGIN_PREFIX . '_include_retype_password');
         if (!$include_retype_password) return;
 
@@ -31,10 +31,10 @@ class Registration {
         return $errors;
     }
 
-    public static function include_retype_password_input() {
+    public static function woocommerce_register_form() {
         $include_retype_password = get_option(PLUGIN_PREFIX . '_include_retype_password');
-        if (!$include_retype_password) return;
-
-        Template::include('app/partials/input-retype-password');
+        if ($include_retype_password) {
+            Template::include('app/partials/input-retype-password');
+        }
     }
 }

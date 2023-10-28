@@ -6,7 +6,6 @@ use verifywoo\core\DB;
 use verifywoo\core\Users;
 use verifywoo\core\Router;
 use verifywoo\core\Token;
-use verifywoo\core\Utils;
 use WP_List_Table;
 
 use const verifywoo\PLUGIN_PREFIX;
@@ -61,9 +60,9 @@ class UsersListTable extends WP_List_Table {
         } else if ($status === 'unverified') {
             return "$verifywoo_table.verified = false OR $verifywoo_table.verified is NULL";
         } else if ($status === 'active') {
-            return "$verifywoo_table.expires > $now";
+            return "$verifywoo_table.token_exp > $now";
         } else if ($status === 'expired') {
-            return "$verifywoo_table.expires < $now";
+            return "$verifywoo_table.token_exp < $now";
         } else {
             return null;
         }
@@ -112,13 +111,13 @@ class UsersListTable extends WP_List_Table {
                 'status' => 'active',
                 'text' => 'Active Token',
                 'current' => $status === 'active',
-                'count' =>  Users::count("$verifywoo_table.expires > $now")
+                'count' =>  Users::count("$verifywoo_table.token_exp > $now")
             ],
             [
                 'status' => 'expired',
                 'text' => 'Expired Token',
                 'current' => $status === 'expired',
-                'count' => Users::count("$verifywoo_table.expires < $now")
+                'count' => Users::count("$verifywoo_table.token_exp < $now")
             ]
         ];
 
@@ -170,11 +169,11 @@ class UsersListTable extends WP_List_Table {
     }
 
     function column_token_status($item) {
-        $expires = $item['expires'] ?? null;
+        $token_exp = $item['token_exp'] ?? null;
 
-        if (!$expires) {
+        if (!$token_exp) {
             return 'null';
-        } else if (!Token::verify_exp($expires)) {
+        } else if (!Token::verify($token_exp)) {
             return '<b style="color: #ff0000">Expired</b>';
         } else {
             return '<b style="color: #008000">Active</b>';

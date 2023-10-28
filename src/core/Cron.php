@@ -28,7 +28,8 @@ class Cron {
         });
     }
 
-    public static function deactivate() {
+    public static function plugin_deactivate() {
+        update_option(PLUGIN_PREFIX . '_automatically_delete_unverified_users', false);
         self::unschedule_all();
     }
 
