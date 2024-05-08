@@ -6,6 +6,7 @@ use verifywoo\core\DB;
 use verifywoo\core\Users;
 use verifywoo\core\Router;
 use verifywoo\core\Token;
+use verifywoo\core\Utils;
 use WP_List_Table;
 
 use const verifywoo\PLUGIN_PREFIX;
@@ -150,7 +151,8 @@ class UsersListTable extends WP_List_Table {
 
         $actions['delete'] = sprintf('<a href="?page=%s&action=delete&view=selection-table&%s">%s</a>', $page, $built_query, __('Delete User', 'verifywoo'));
 
-        if ($user['verified'] === 'yes') {
+
+        if ($user['verified']) {
             $actions['unverify'] = sprintf('<a href="?page=%s&action=unverify&view=selection-table&%s">%s</a>', $page, $built_query, __('Unverify', 'verifywoo'));
         } else {
             $actions['verify'] = sprintf('<a href="?page=%s&action=verify&view=selection-table&%s">%s</a>', $page, $built_query, __('Verify', 'verifywoo'));

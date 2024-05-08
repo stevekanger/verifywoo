@@ -50,6 +50,7 @@ class SelectionTable {
                 foreach ($users as $user) {
                     Users::unverify($user['ID']);
                 }
+                break;
             default:
                 return Template::admin_message(__('Invalid action.', 'verifywoo'));
         }
