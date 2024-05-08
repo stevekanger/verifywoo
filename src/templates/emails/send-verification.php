@@ -18,6 +18,6 @@ defined('ABSPATH') || exit; ?>
 
 <p><a href="<?php echo $link_uri; ?>"><?php echo $link_uri; ?></a></p>
 
-<p>This link will be valid for <?php echo get_option(PLUGIN_PREFIX . '_verification_expiration_length') ?>. If your link has expired resend your verification link. <a href="<?php echo Router::get_page_permalink('email-verification') ?>">Resend verification link</a></p>
+<p>This link will be valid for <?php echo get_option(PLUGIN_PREFIX . '_verification_expiration_length') ?>. If your link has expired resend your verification link. <a href="<?php echo Router::get_page_permalink('email-verification') ?>">Send verification link</a></p>
 
 <?php wc_get_template('emails/email-footer.php'); ?>

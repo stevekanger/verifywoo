@@ -245,7 +245,7 @@ class AdminSettings {
                 'title' => __('Delete Settings', 'verifywoo'),
                 'callback' => [self::class, 'delete_settings_section_callback'],
                 'args' => [
-                    'description' => __('These settings are used to verify if and how often you would like to delete unverified users. Users will only be deleted if tokens are expired.', 'verifywoo'),
+                    'description' => __('These settings are used to verify if and how often you would like to delete unverified users. Users will only be deleted if tokens are expired. Any users registered when this plugin not activated will not be deleted.', 'verifywoo'),
                 ],
                 'settings' => [
                     [

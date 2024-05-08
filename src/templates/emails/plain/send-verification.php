@@ -21,6 +21,8 @@ $link_uri = Router::get_page_permalink('email-verification', [
 
 echo $link_uri . "\r\n";
 
+echo "\n\n";
+
 $expiration_length = get_option(PLUGIN_PREFIX . '_verification_expiration_length');
 $resend_link = Router::get_page_permalink('email-verification');
 

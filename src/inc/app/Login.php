@@ -18,7 +18,7 @@ class Login {
 
         $verified = $user['verified'] ?? null;
         if (!$verified) {
-            $errors->add('email-verification-error', __('User email is not verified. If you need to you can resend the verification link <a href="' . Router::get_page_permalink('email-verification') . '">Click to resend</a>', 'verifywoo'));
+            $errors->add('email-verification-error', __('User email needs to be verified. <a href="' . Router::get_page_permalink('email-verification') . '">Click to send verification</a>', 'verifywoo'));
             return $errors;
         }
 

@@ -29,22 +29,37 @@ class Send {
             return Template::error(__('Email is required.', 'verifywoo'));
         }
 
-        $query = DB::get_row('SELECT id, verified from ' . DB::table(PLUGIN_PREFIX) . ' where email = %s', $email);
+        $user = get_user_by('email', $email);
 
-        if (!$query) {
+        if (!$user) {
             return Template::error(__('There is no user with that email registered.', 'verifywoo'));
-        } else  if ($query['verified']) {
+        }
+
+        $verifywoo_table = DB::table(PLUGIN_PREFIX);
+        $table_query = DB::get_row('SELECT id, verified from ' . $verifywoo_table . ' where email = %s', $email);
+
+        if ($table_query['verified']) {
             return Template::error(__('That email is already verified.', 'verifywoo'));
         }
 
         $token = Token::create();
-        $verifywoo_table = DB::table(PLUGIN_PREFIX);
-        $inserted = DB::update($verifywoo_table, [
-            'token' => $token,
-            'token_exp' => Token::set_exp()
-        ], [
-            'id' => $query['id']
-        ]);
+        $inserted = null;
+
+        if (!$table_query) {
+            $inserted = DB::insert($verifywoo_table, [
+                'user_id' => $user->ID,
+                'token' => $token,
+                'token_exp' => Token::set_exp(),
+                'email' => $email,
+            ], ['%d', '%s', '%d', '%s', '%s']);
+        } else {
+            $inserted = DB::update($verifywoo_table, [
+                'token' => $token,
+                'token_exp' => Token::set_exp()
+            ], [
+                'id' => $table_query['id']
+            ]);
+        }
 
         if (!$inserted) {
             return Template::error(__('There was an error creating your verification data. Please try again. If the problem persists contact your site administrator.', 'verifywoo'));
