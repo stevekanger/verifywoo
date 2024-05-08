@@ -151,7 +151,6 @@ class UsersListTable extends WP_List_Table {
 
         $actions['delete'] = sprintf('<a href="?page=%s&action=delete&view=selection-table&%s">%s</a>', $page, $built_query, __('Delete User', 'verifywoo'));
 
-
         if ($user['verified']) {
             $actions['unverify'] = sprintf('<a href="?page=%s&action=unverify&view=selection-table&%s">%s</a>', $page, $built_query, __('Unverify', 'verifywoo'));
         } else {

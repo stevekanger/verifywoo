@@ -39,6 +39,7 @@ class SelectionTable {
                     if (!$can_delete) {
                         continue;
                     }
+                    Users::delete($user['ID']);
                 }
                 break;
             case 'verify':
