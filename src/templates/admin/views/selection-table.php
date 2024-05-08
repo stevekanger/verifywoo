@@ -41,7 +41,7 @@ defined('ABSPATH') || exit; ?>
                 <p style="font-size: 1.2em; color: #ff0000">Danger Zone: This will permanently delete these users and cannot be undone without backing up your data. </p>
             <?php endif; ?>
             <?php if ($data['action'] === 'unverify') : ?>
-                <p style="font-size: 1.2em; color: #ff0000">Note: Token status will be set to null and the user will need to resend a verification link. The selected users will not be automatically deleted if you have this option selected and you will need to manually delete them. </p>
+                <p style="font-size: 1.2em; color: #ff0000">Note: Users will need to resend their verification token if still active. If you have "Automatically delete unverified users" set in settings these users will not be deleted.</p>
             <?php endif; ?>
             <p>
                 <button type="submit" class="button button-primary"><?php echo ucfirst($data['action']) ?> Users</button>
