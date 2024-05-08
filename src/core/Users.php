@@ -60,6 +60,21 @@ class Users {
     public static function verify($user_id) {
         $verifywoo_table = DB::table(PLUGIN_PREFIX);
 
+        $in_table = DB::get_row("SELECT * from $verifywoo_table where user_id = %d", [$user_id]);
+
+        if (!$in_table) {
+            $user = get_user_by('ID', $user_id);
+            $verifywoo_table = DB::table(PLUGIN_PREFIX);
+
+            return DB::insert($verifywoo_table, [
+                'user_id' => $user_id,
+                'token' => null,
+                'token_exp' => null,
+                'email' => $user->user_email,
+                'verified' => true,
+            ], ['%d', '%s', '%d', '%s', '%s']);
+        }
+
         return DB::update($verifywoo_table, [
             'token' => null,
             'token_exp' => null,
@@ -71,6 +86,7 @@ class Users {
 
     public static function unverify($user_id) {
         $verifywoo_table = DB::table(PLUGIN_PREFIX);
+
         return DB::update($verifywoo_table, [
             'verified' => false,
         ], [
