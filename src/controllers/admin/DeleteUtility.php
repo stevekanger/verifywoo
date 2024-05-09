@@ -2,6 +2,7 @@
 
 namespace verifywoo\controllers\admin;
 
+use const verifywoo\PLUGIN_PREFIX;
 use verifywoo\core\Users;
 use verifywoo\core\Template;
 
@@ -22,6 +23,12 @@ class DeleteUtility {
     }
 
     public static function post() {
+        $nonce = $_REQUEST['_wpnonce'] ?? null;
+
+        if (!wp_verify_nonce($nonce, PLUGIN_PREFIX . '_selection_table')) {
+            Template::admin_message(__('Invalid request.', 'verifywoo'));
+        }
+
         Users::delete_unverified();
         Template::admin_message(__('Users deleted successfully.', 'verifywoo'));
     }

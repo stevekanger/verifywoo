@@ -2,6 +2,7 @@
 
 namespace verifywoo\controllers\admin;
 
+use const verifywoo\PLUGIN_PREFIX;
 use verifywoo\core\Template;
 use verifywoo\core\Router;
 use verifywoo\core\Users;
@@ -23,6 +24,12 @@ class SelectionTable {
     }
 
     public static function post() {
+        $nonce = $_REQUEST['_wpnonce'] ?? null;
+
+        if (!wp_verify_nonce($nonce, PLUGIN_PREFIX . '_selection_table')) {
+            Template::admin_message(__('Invalid request.', 'verifywoo'));
+        }
+
         $users = unserialize(urldecode($_REQUEST['users'] ?? []));
         $redirect = urldecode($_REQUEST['redirect']) ?? admin_url('admin.php?page=' . ($_REQUEST['page'] ?? null));
 

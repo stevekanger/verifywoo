@@ -22,5 +22,6 @@ $redirect = Router::get_query_string(); ?>
     <input type="hidden" name="page" value="<?php echo $_REQUEST['page'] ?>" />
     <input type="hidden" name="redirect" value="<?php echo urlencode(admin_url('admin.php' . $redirect)) ?>">
     <input type="hidden" name="view" value="selection-table">
+
     <?php $table->display() ?>
 </form>
