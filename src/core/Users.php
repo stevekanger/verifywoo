@@ -101,6 +101,7 @@ class Users {
 
     public static function delete_unverified() {
         $users = self::get_unverified();
+
         foreach ($users as $user) {
             self::delete($user['ID']);
         }

@@ -23,7 +23,7 @@ class Registration {
 
     public static function woocommerce_registration_errors($errors, $username, $email) {
         $include_retype_password = get_option(PLUGIN_PREFIX . '_include_retype_password');
-        if (!$include_retype_password) return;
+        if (!$include_retype_password) return $errors;
 
         if (strcmp($_POST['password'], $_POST['password2']) !== 0) {
             $errors->add('registration-error', __('Your passwords do not match.', 'verifywoo'));
